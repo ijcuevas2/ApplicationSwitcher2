@@ -2,9 +2,11 @@
 using System.Linq;
 using System.Collections.Generic;
 using System.Windows;
-using System.Windows.Automation;
-using System.Runtime.InteropServices;
+using System.Windows.Data;
 using System.Windows.Input;
+using System.Windows.Automation;
+using System.Collections.ObjectModel;
+using System.Runtime.InteropServices;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Diagnostics;
@@ -16,53 +18,27 @@ namespace WpfApp1
     /// </summary>
     public partial class MainWindow : Window
     {
+        // CollectionViewSource listingDataView;
+        // ObservableCollection<WindowSummary> WindowSummaries { get; set; }
+
         public MainWindow()
         {
+
             InitializeComponent();
             Keyevent();
             this.KeyDown += new KeyEventHandler(MainWindow_KeyDown);
             Console.WriteLine("App.Current.Windows:", App.Current.Windows);
             Console.WriteLine("Hello");
             Process[] processList = Process.GetProcesses();
-
-            foreach (Process process in processList)
-            {
-                Console.WriteLine("Process: {0} Id: {1}", process.ProcessName, process.Id);
-            }
-
-            for (int i = 0; i < 5; i++)
-            {
-                Console.WriteLine(" ");
-            }
-
-            foreach (Process process in processList)
-            {
-                if (!String.IsNullOrEmpty(process.MainWindowTitle))
-                {
-                    Console.WriteLine("Process: {0} Id: {1} Window title: {2} Process File Path: {3}", process.ProcessName, process.Id, process.MainWindowTitle, process.MainModule.FileName);
-                    if (process.ProcessName == "chrome")
-                    {
-                        AutomationElement element = AutomationElement.FromHandle(process.MainWindowHandle);
-                        Icon programIcon = System.Drawing.Icon.ExtractAssociatedIcon(process.MainModule.FileName);
-                        Bitmap bmp = programIcon.ToBitmap();
-                        ImageCodecInfo programImageCodeInfo = GetEncoderInfo("image/jpeg");
-                        Encoder qualityEncoder = Encoder.Quality;
-                        EncoderParameter programEncoderParameter = new EncoderParameter(qualityEncoder, 25L);
-                        EncoderParameters encoderParameters = new EncoderParameters(1);
-                        encoderParameters.Param[0] = programEncoderParameter;
-                        bmp.Save(@"C:\Users\Ismael Cuevas\Documents\example.jpg", programImageCodeInfo, encoderParameters);
-                 
-                        // if (element != null)
-                        // {
-                        //     element.SetFocus();
-                        // }
-                    }
-                }
-            }
-
+            // listingDataView = null;
+            List<Process> mainProcessList = WindowSummaryManager.GetRunningPrograms();
+            ObservableCollection<WindowSummary> WindowSummaries = WindowSummaryManager.getWindowSummaryInfo(mainProcessList);
+            programList.ItemsSource = WindowSummaries; 
         }
 
-        // NOTE: Code for checking if things work
+        // DisplayMemberBinding="{Binding programIcon}" 
+
+        // NOTE: Code for checking if icons work
         // if (process.ProcessName == "chrome")
         // {
         //     AutomationElement element = AutomationElement.FromHandle(process.MainWindowHandle);

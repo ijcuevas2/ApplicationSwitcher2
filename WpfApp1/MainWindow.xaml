@@ -6,7 +6,21 @@
         xmlns:local="clr-namespace:WpfApp1"
         mc:Ignorable="d"
         Title="MainWindow" Height="350" Width="525">
-    <ListView>
-        
-    </ListView>
+    <Grid>
+        <ListView Name="programList">
+            <ListView.View> 
+                <GridView>
+                    <GridViewColumn Width="100" Header="Icon" >
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <Image Name="MyImage" Width="20" Source="{Binding ProgramIcon}" />
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn Width="100" Header="Title" DisplayMemberBinding="{Binding ProgramName}" />
+                    <GridViewColumn Width="300"  Header="Window Title" DisplayMemberBinding="{Binding ProgramWindowTitle}" />
+                </GridView>
+            </ListView.View>
+        </ListView>
+    </Grid>
 </Window>
