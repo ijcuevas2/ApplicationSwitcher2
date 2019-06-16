@@ -57,21 +57,18 @@ namespace WpfApp1
             ObservableCollection<WindowSummary> windowSummaries = new ObservableCollection<WindowSummary>();
             foreach (Process process in processList)
             {
+                int currentProcessId = Process.GetCurrentProcess().Id;
+                if (currentProcessId == process.Id)
+                {
+                    // Application.Current.Windows;
+                    System.Diagnostics.Debug.WriteLine("Skipping Process!!");
+                    continue;
+                }
+
                 if (!String.IsNullOrEmpty(process.MainWindowTitle))
                 {
                     AutomationElement element = AutomationElement.FromHandle(process.MainWindowHandle);
-                    // TODO: check if these are null
-                    // Also check if I could just use regular icons
                     Icon associatedProgramIcon = System.Drawing.Icon.ExtractAssociatedIcon(process.MainModule.FileName);
-
-                    
-                    
-                    // ImageCodecInfo programImageCodecInfo = GetEncoderInfo("image/jpeg");
-                    // Encoder qualityEncoder = Encoder.Quality;
-                    // EncoderParameter programEncoderParameter = new EncoderParameter(qualityEncoder, 25L);
-                    // EncoderParameters encoderParameters = new EncoderParameters(1);
-                    // encoderParameters.Param[0] = programEncoderParameter;
-
                     WindowSummary currWindowSummary = new WindowSummary();
                     currWindowSummary.ProgramIcon = ToImageSource(associatedProgramIcon);
                     currWindowSummary.ProgramName = process.ProcessName;
@@ -89,20 +86,6 @@ namespace WpfApp1
                                       Int32Rect.Empty, 
                                       BitmapSizeOptions.FromEmptyOptions()); 
             return imageSource;
-        }
-
-        private static ImageCodecInfo GetEncoderInfo(String mimeType)
-        {
-            ImageCodecInfo[] encoders;
-            encoders = ImageCodecInfo.GetImageDecoders();
-            for (int i = 0; i < encoders.Length; i++)
-            {
-                if (encoders[i].MimeType == mimeType)
-                {
-                    return encoders[i];
-                }
-            }
-            return null;
         }
     }
 

@@ -1,66 +1,93 @@
 ﻿using System;
 using System.Linq;
+using System.ComponentModel;
 using System.Collections.Generic;
 using System.Windows;
-using System.Windows.Data;
 using System.Windows.Input;
-using System.Windows.Automation;
+using System.Windows.Controls;
 using System.Collections.ObjectModel;
 using System.Runtime.InteropServices;
-using System.Drawing;
-using System.Drawing.Imaging;
+using System.Runtime.CompilerServices;
 using System.Diagnostics;
+
 
 namespace WpfApp1
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainWindow : Window, INotifyPropertyChanged
     {
-        // CollectionViewSource listingDataView;
-        // ObservableCollection<WindowSummary> WindowSummaries { get; set; }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        sealed class CallerMemberNameAttribute: Attribute { }
+        ObservableCollection<WindowSummary> windowSummaries = null;
+
+        // NOTE: variables for setting up windows icon
+        private System.Windows.Forms.NotifyIcon _notifyIcon;
+        private bool _isExit;
+
+        private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        private int _programIndex = 0;
+        public int ProgramIndex {
+            get { return _programIndex; }
+            set
+            {
+                Console.WriteLine("windowSummaries.Count: {0}", windowSummaries.Count);
+                if (windowSummaries.Count < 1)
+                {
+                    return;
+                }
+
+                int upperBound = windowSummaries.Count - 1;
+
+                if (value < 0)
+                {
+                    value = upperBound;
+                }
+
+                if (value > upperBound)
+                {
+                    value = 0;
+                }
+
+                if(_programIndex != value)
+                {
+
+                    _programIndex = value;
+                    this.NotifyPropertyChanged();
+                }
+            }
+        }
+
 
         public MainWindow()
         {
 
             InitializeComponent();
+
+            // TODO: figure out what this does
+            Style = (Style)FindResource(typeof(Window));
             Keyevent();
             this.KeyDown += new KeyEventHandler(MainWindow_KeyDown);
             Console.WriteLine("App.Current.Windows:", App.Current.Windows);
             Console.WriteLine("Hello");
             Process[] processList = Process.GetProcesses();
-            // listingDataView = null;
+            // TODO: Refactor this
             List<Process> mainProcessList = WindowSummaryManager.GetRunningPrograms();
-            ObservableCollection<WindowSummary> WindowSummaries = WindowSummaryManager.getWindowSummaryInfo(mainProcessList);
-            programList.ItemsSource = WindowSummaries; 
+            this.windowSummaries = WindowSummaryManager.getWindowSummaryInfo(mainProcessList);
+            programList.ItemsSource = this.windowSummaries;
+            Window window = Application.Current.MainWindow;
+            DataContext = this;
+
+            window.WindowStartupLocation = WindowStartupLocation.CenterScreen;
+            window.WindowStyle = WindowStyle.None;
+            window.ResizeMode = ResizeMode.NoResize;
         }
-
-        // DisplayMemberBinding="{Binding programIcon}" 
-
-        // NOTE: Code for checking if icons work
-        // if (process.ProcessName == "chrome")
-        // {
-        //     AutomationElement element = AutomationElement.FromHandle(process.MainWindowHandle);
-        //     Icon programIcon = System.Drawing.Icon.ExtractAssociatedIcon(process.MainModule.FileName);
-        //     Bitmap bmp = programIcon.ToBitmap();
-        //     ImageCodecInfo programImageCodeInfo = GetEncoderInfo("image/jpeg");
-        //     Encoder qualityEncoder = Encoder.Quality;
-        //     EncoderParameter programEncoderParameter = new EncoderParameter(qualityEncoder, 25L);
-        //     EncoderParameters encoderParameters = new EncoderParameters(1);
-        //     encoderParameters.Param[0] = programEncoderParameter;
-        //     bmp.Save(@"C:\Users\Ismael Cuevas\Documents\example.jpg", programImageCodeInfo, encoderParameters);
-     
-        //     // if (element != null)
-        //     // {
-        //     //     element.SetFocus();
-        //     // }
-        // }
-
-        // private void Window_Loaded(object sender, RoutedEventArgs e)
-        // {
-        //     this.KeyDown += new KeyEventHandler(MainWindow_KeyDown);
-        // }
 
         public static void MainWindow_KeyDown(object sender, KeyEventArgs e)
         {
@@ -68,28 +95,10 @@ namespace WpfApp1
             Console.WriteLine("Tab Key: {0}", e.SystemKey == Key.Tab);
             Console.WriteLine("F4 Key: {0}", e.SystemKey == Key.F4);
 
-            if (Keyboard.Modifiers == ModifierKeys.Alt)
+            if ((Keyboard.Modifiers & ModifierKeys.Control) != 0 && e.Key == Key.Tab)
             {
                 e.Handled = true;
-                Console.WriteLine("Pressing Alt!!");
-                // Console.WriteLine("Pressing Alt + Tab!!");
-            } else if (e.Key == Key.Tab) {
-                Console.WriteLine("Pressing Tab!!");
             }
-        }
-
-        private static ImageCodecInfo GetEncoderInfo(String mimeType)
-        {
-            ImageCodecInfo[] encoders;
-            encoders = ImageCodecInfo.GetImageDecoders();
-            for (int i = 0; i < encoders.Length; i++)
-            {
-                if (encoders[i].MimeType == mimeType)
-                {
-                    return encoders[i];
-                }
-            }
-            return null;
         }
 
         /* Code to disable WinKey, Alt + Tab, Ctrl + Esc */
@@ -132,7 +141,7 @@ namespace WpfApp1
             }
         }
 
-        private static int LowLevelKeyboardProc(int nCode, int wParam, ref KBDLLHOOKSSTRUCT lParam)
+        private int LowLevelKeyboardProc(int nCode, int wParam, ref KBDLLHOOKSSTRUCT lParam)
         {
             if (nCode >= 0)
             {
@@ -142,10 +151,19 @@ namespace WpfApp1
                     case 257: // WM_KEYUP
                     case 260: // WM_SYSKEYDOWN
                     case 261: // M_SYSKEYUP
-                    if ((lParam.vkCode == 0x09 && lParam.flags == 32)) {
+                    Console.WriteLine("Pressing Shift?: {0}", (lParam.vkCode == 0xA0 || lParam.vkCode == 0xA1));
+                    Console.WriteLine("Pressing Shift Key Code: {0}", lParam.vkCode);
+                    Console.WriteLine("Mod", lParam.vkCode);
+                    if ((lParam.vkCode == 0x09 && (Keyboard.Modifiers & ModifierKeys.Shift) != 0 && lParam.flags == 32)) {
+                        Console.WriteLine("Pressing Alt + Shift + Tab");
+                        ProgramIndex--;
+                        return 1;
+                    } else if ((lParam.vkCode == 0x09 && lParam.flags == 32)) {
                         Console.WriteLine("Pressing Alt + Tab");
+                        ProgramIndex++;
                         return 1;
                     }
+
                     break;
                 }
 

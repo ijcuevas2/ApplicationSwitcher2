@@ -5,22 +5,55 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfApp1"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
-    <Grid>
-        <ListView Name="programList">
-            <ListView.View> 
+        Title="MainWindow" Height="Auto" Width="Auto" SizeToContent="WidthAndHeight">
+        <!-- ShowInTaskbar="False" -->
+    <Window.Resources>
+        <Style TargetType="ListViewItem">
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+            <Setter Property="VerticalContentAlignment" Value="Stretch" />
+        </Style>
+        <Style TargetType="{x:Type Window}">
+            <Setter Property="FontFamily" Value="Segoe UI" />
+            <Setter Property="FontSize" Value="18" />
+        </Style>
+    </Window.Resources>
+    <StackPanel>
+        <TextBox Background="#1D1D1D" TextElement.Foreground="White" Height="30" MaxLength="30" Visibility="Collapsed"/>
+        <ListView Name="programList" 
+              Background="#1D1D1D" 
+              TextElement.Foreground="White"
+              SelectedIndex="{Binding Path=ProgramIndex}"
+              SelectionMode="Single">
+            <ListView.View>
                 <GridView>
-                    <GridViewColumn Width="100" Header="Icon" >
+                    <GridView.ColumnHeaderContainerStyle>
+                        <Style TargetType="{x:Type GridViewColumnHeader}">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                        </Style>
+                    </GridView.ColumnHeaderContainerStyle>
+                    <GridViewColumn Width="Auto" Header="Title" >
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding ProgramName}" TextAlignment="Right" />
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn Width="Auto" Header="Icon" >
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <Image Name="MyImage" Width="20" Source="{Binding ProgramIcon}" />
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
-                    <GridViewColumn Width="100" Header="Title" DisplayMemberBinding="{Binding ProgramName}" />
-                    <GridViewColumn Width="300"  Header="Window Title" DisplayMemberBinding="{Binding ProgramWindowTitle}" />
+                    <GridViewColumn Width="Auto" Header="Window Title">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding ProgramWindowTitle}" TextAlignment="Left" Width="Auto"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
                 </GridView>
             </ListView.View>
         </ListView>
-    </Grid>
+    </StackPanel>
 </Window>
