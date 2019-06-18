@@ -5,7 +5,9 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfApp1"
         mc:Ignorable="d"
-        Title="MainWindow" Height="Auto" Width="Auto" SizeToContent="WidthAndHeight">
+        Title="MainWindow" Height="Auto" 
+        Width="Auto" 
+        SizeToContent="WidthAndHeight" d:DesignWidth="282" d:DesignHeight="141">
         <!-- ShowInTaskbar="False" -->
     <Window.Resources>
         <Style TargetType="ListViewItem">
@@ -18,12 +20,27 @@
         </Style>
     </Window.Resources>
     <StackPanel>
-        <TextBox Background="#1D1D1D" TextElement.Foreground="White" Height="30" MaxLength="30" Visibility="Collapsed"/>
+        <TextBox Name="textBoxElement" Background="#1D1D1D" TextElement.Foreground="White" Height="30" MaxLength="30" Visibility="{Binding TextBoxVisibility}"/>
         <ListView Name="programList" 
               Background="#1D1D1D" 
               TextElement.Foreground="White"
               SelectedIndex="{Binding Path=ProgramIndex}"
-              SelectionMode="Single">
+              SelectionMode="Single"
+              PreviewMouseMove="PreviewMouse_Move">
+            <!-- <ListView.ItemContainerStyle>
+                <Style TargetType="ListViewItem">
+                    <Setter Property="SnapsToDevicePixels" 
+                            Value="True"/>
+                    <Setter Property="OverridesDefaultStyle" 
+                            Value="True"/>
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="ListBoxItem">
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </ListView.ItemContainerStyle> -->
             <ListView.View>
                 <GridView>
                     <GridView.ColumnHeaderContainerStyle>

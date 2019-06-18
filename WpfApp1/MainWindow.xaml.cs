@@ -1,13 +1,10 @@
 ﻿using System;
-using System.Linq;
 using System.ComponentModel;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Input;
-using System.Windows.Controls;
 using System.Collections.ObjectModel;
 using System.Runtime.InteropServices;
-using System.Runtime.CompilerServices;
 using System.Diagnostics;
 
 
@@ -22,10 +19,7 @@ namespace WpfApp1
         public event PropertyChangedEventHandler PropertyChanged;
         sealed class CallerMemberNameAttribute: Attribute { }
         ObservableCollection<WindowSummary> windowSummaries = null;
-
-        // NOTE: variables for setting up windows icon
-        private System.Windows.Forms.NotifyIcon _notifyIcon;
-        private bool _isExit;
+        public Boolean isKeyboardShortcut = false;
 
         private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
         {
@@ -64,6 +58,30 @@ namespace WpfApp1
             }
         }
 
+        private String _textBoxVisibility = "Collapsed";
+        public String TextBoxVisibility
+        {
+            get { return _textBoxVisibility; }
+            set
+            {
+                if (_textBoxVisibility != value)
+                {
+                    _textBoxVisibility = value;
+                    this.NotifyPropertyChanged();
+                }
+            }
+        }
+
+        public void setTextBoxVisible()
+        {
+            TextBoxVisibility = "Visible";
+            textBoxElement.Focus();
+        }
+
+        public void setTextBoxCollapsed()
+        {
+            TextBoxVisibility = "Collapsed";
+        }
 
         public MainWindow()
         {
@@ -74,30 +92,74 @@ namespace WpfApp1
             Style = (Style)FindResource(typeof(Window));
             Keyevent();
             this.KeyDown += new KeyEventHandler(MainWindow_KeyDown);
-            Console.WriteLine("App.Current.Windows:", App.Current.Windows);
-            Console.WriteLine("Hello");
+            // Console.WriteLine("App.Current.Windows:", App.Current.Windows);
+            // Console.WriteLine("Hello");
             Process[] processList = Process.GetProcesses();
             // TODO: Refactor this
             List<Process> mainProcessList = WindowSummaryManager.GetRunningPrograms();
             this.windowSummaries = WindowSummaryManager.getWindowSummaryInfo(mainProcessList);
             programList.ItemsSource = this.windowSummaries;
+            // programList.MouseEnter += new MouseEventHandler(Mouse_Enter);
             Window window = Application.Current.MainWindow;
             DataContext = this;
-
             window.WindowStartupLocation = WindowStartupLocation.CenterScreen;
             window.WindowStyle = WindowStyle.None;
             window.ResizeMode = ResizeMode.NoResize;
+            // MainWindow_Hide();
         }
 
-        public static void MainWindow_KeyDown(object sender, KeyEventArgs e)
-        {
-            Console.WriteLine("Alt Key: {0}", Keyboard.Modifiers == ModifierKeys.Alt);
-            Console.WriteLine("Tab Key: {0}", e.SystemKey == Key.Tab);
-            Console.WriteLine("F4 Key: {0}", e.SystemKey == Key.F4);
+        // public static void Mouse_Enter(object sender, MouseEventArgs e)
+        // {
+        //     programList.SelectedItem = e.
+        // }
 
+        public void MainWindow_KeyDown(object sender, KeyEventArgs e)
+        {
             if ((Keyboard.Modifiers & ModifierKeys.Control) != 0 && e.Key == Key.Tab)
             {
                 e.Handled = true;
+            }
+
+            if (e.Key == Key.Escape)
+            {
+                MainWindow_Hide();
+            }
+
+            Boolean isAlphaNumeric = isAlphaNumericKeyPress(e.Key);
+            // Console.WriteLine("e.Key: {0}", (int)e.Key);
+            // Console.WriteLine("isAlphaNumeric: {0}", isAlphaNumeric);
+
+            if (isAlphaNumeric)
+            {
+                setTextBoxVisible();
+            }
+        }
+
+        public Boolean isAlphaNumericKeyPress(Key key)
+        {
+            int keyValue = (int)key;
+
+            // letters, numbers, keypad
+            return ((keyValue >= 0x30 && keyValue <= 0x39))
+                || ((keyValue >= 0x41 && keyValue <= 0x5A))
+                || ((keyValue >= 0x60 && keyValue <= 0x69));
+        }
+
+        private void PreviewMouse_Move(object sender, MouseEventArgs e)
+        {
+            if (isKeyboardShortcut)
+            {
+                return;
+            }
+
+            FrameworkElement ctrl = (e.OriginalSource as FrameworkElement);
+            if (ctrl != null)
+            {
+                WindowSummary windowSummary = ctrl.DataContext as WindowSummary;
+                if (windowSummary != null)
+                {
+                    programList.SelectedItem = windowSummary;
+                }
             }
         }
 
@@ -143,33 +205,84 @@ namespace WpfApp1
 
         private int LowLevelKeyboardProc(int nCode, int wParam, ref KBDLLHOOKSSTRUCT lParam)
         {
+            // Console.WriteLine("LowLevelKeyboardProc");
             if (nCode >= 0)
             {
-                switch (wParam)
+                // Console.WriteLine("wParam: {0}", wParam);
+                Boolean isKeyDown = wParam == 256 || wParam == 260;
+                Boolean isKeyUp = wParam == 257 || wParam == 261;
+                if (isKeyDown)
                 {
-                    case 256: // WM_KEYDOWN
-                    case 257: // WM_KEYUP
-                    case 260: // WM_SYSKEYDOWN
-                    case 261: // M_SYSKEYUP
-                    Console.WriteLine("Pressing Shift?: {0}", (lParam.vkCode == 0xA0 || lParam.vkCode == 0xA1));
-                    Console.WriteLine("Pressing Shift Key Code: {0}", lParam.vkCode);
-                    Console.WriteLine("Mod", lParam.vkCode);
-                    if ((lParam.vkCode == 0x09 && (Keyboard.Modifiers & ModifierKeys.Shift) != 0 && lParam.flags == 32)) {
-                        Console.WriteLine("Pressing Alt + Shift + Tab");
-                        ProgramIndex--;
+                    // case 256: // WM_KEYDOWN
+                    // case 260: // WM_SYSKEYDOWN
+                    // Console.WriteLine("Pressing Shift?: {0}", (lParam.vkCode == 0xA0 || lParam.vkCode == 0xA1));
+                    // Console.WriteLine("Pressing Shift Key Code: {0}", lParam.vkCode);
+                    // Console.WriteLine("Mod", lParam.vkCode);
+                    Boolean isAltTab = lParam.vkCode == 0x09 && lParam.flags == 32;
+                    if (isAltTab)
+                    {
+                        this.ShowMainWindow();
+                        isKeyboardShortcut = true;
+                        Boolean isShiftKey = (Keyboard.Modifiers & ModifierKeys.Shift) != 0;
+                        Console.WriteLine("isShiftKey: {0}", isShiftKey);
+                        if (isShiftKey) {
+                            Console.WriteLine("Pressing Alt + Shift + Tab");
+                            ProgramIndex--;
+                        } else {
+                            Console.WriteLine("Pressing Alt + Tab");
+                            ProgramIndex++;
+                        }
+
+                        isKeyboardShortcut = false;
                         return 1;
-                    } else if ((lParam.vkCode == 0x09 && lParam.flags == 32)) {
-                        Console.WriteLine("Pressing Alt + Tab");
-                        ProgramIndex++;
+                    }
+                }
+
+                // case 257: // WM_KEYUP
+                // case 261: // WM_SYSKEYUP
+                // break;
+                if (isKeyUp)
+                {
+                    // Boolean isAlt = lParam.flags == 32;
+                    Boolean isAlt = lParam.vkCode == 0xA4 || lParam.vkCode == 0xA5;
+                    // Console.WriteLine("isAlt: {0}", isAlt);
+                    // Console.WriteLine("lParam.vkCode: {0}", lParam.vkCode);
+                    if (isAlt)
+                    {
+                        MainWindow_Hide();
                         return 1;
                     }
 
-                    break;
                 }
-
             }
 
             return CallNextHookEx(0, nCode, wParam, ref lParam);
+        }
+
+        public void ShowMainWindow()
+        {
+            // Console.WriteLine("MainWindow_Show()");
+            // Console.WriteLine("this.IsVisible: {0}", this.IsVisible);
+            // if (this.IsVisible)
+            // {
+            //     if (this.WindowState == WindowState.Minimized)
+            //     {
+            //         this.WindowState = WindowState.Normal;
+            //     }
+            //     else
+            //     {
+            //         this.Show();
+            //     }
+            // }
+
+            this.Show();
+        }
+
+        public void MainWindow_Hide()
+        {
+            Console.WriteLine("MainWindow_Hide()");
+            setTextBoxCollapsed();
+            this.Hide();
         }
 
         private void Window_Closed(object sender, EventArgs e)
