@@ -126,8 +126,6 @@ namespace WpfApp1
             }
 
             Boolean isAlphaNumeric = isAlphaNumericKeyPress(e.Key);
-            // Console.WriteLine("e.Key: {0}", (int)e.Key);
-            // Console.WriteLine("isAlphaNumeric: {0}", isAlphaNumeric);
 
             if (isAlphaNumeric)
             {
@@ -137,7 +135,7 @@ namespace WpfApp1
 
         public Boolean isAlphaNumericKeyPress(Key key)
         {
-            int keyValue = (int)key;
+            int keyValue = (int)key;
 
             // letters, numbers, keypad
             return ((keyValue >= 0x30 && keyValue <= 0x39))
@@ -216,7 +214,15 @@ namespace WpfApp1
                     // case 256: // WM_KEYDOWN
                     // case 260: // WM_SYSKEYDOWN
                     // Console.WriteLine("Pressing Shift?: {0}", (lParam.vkCode == 0xA0 || lParam.vkCode == 0xA1));
-                    // Console.WriteLine("Pressing Shift Key Code: {0}", lParam.vkCode);
+                    Console.WriteLine("lParam.vkCode: {0}", lParam.vkCode);
+                    Key currentKey = KeyInterop.KeyFromVirtualKey(lParam.vkCode);
+                    Console.WriteLine("isAlphaNumericKeyPress(currentKey): {0}", isAlphaNumericKeyPress(currentKey));
+                    if (isAlphaNumericKeyPress(currentKey))
+                    {
+                        setTextBoxVisible();
+                        return 1;
+                    }
+
                     // Console.WriteLine("Mod", lParam.vkCode);
                     Boolean isAltTab = lParam.vkCode == 0x09 && lParam.flags == 32;
                     if (isAltTab)
@@ -249,8 +255,8 @@ namespace WpfApp1
                     // Console.WriteLine("lParam.vkCode: {0}", lParam.vkCode);
                     if (isAlt)
                     {
-                        MainWindow_Hide();
-                        return 1;
+                        // MainWindow_Hide();
+                        // return 1;
                     }
 
                 }
@@ -285,6 +291,7 @@ namespace WpfApp1
             this.Hide();
         }
 
+        // TODO: Figure out that this gets called properly
         private void Window_Closed(object sender, EventArgs e)
         {
             UnhookWindowsHookEx(hHook);
