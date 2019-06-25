@@ -7,8 +7,8 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="Auto" 
         Width="Auto" 
-        SizeToContent="WidthAndHeight" d:DesignWidth="282" d:DesignHeight="141">
-        <!-- ShowInTaskbar="False" -->
+        SizeToContent="WidthAndHeight">
+         <!-- ShowInTaskbar="False"-->
     <Window.Resources>
         <Style TargetType="ListViewItem">
             <Setter Property="HorizontalContentAlignment" Value="Stretch" />
@@ -20,7 +20,11 @@
         </Style>
     </Window.Resources>
     <StackPanel>
-        <TextBox Name="textBoxElement" Background="#1D1D1D" TextElement.Foreground="White" Height="30" MaxLength="30" Visibility="{Binding TextBoxVisibility}"/>
+        <!--TODO: refactor this portion later   -->
+        <TextBox  Text="{Binding Text, Mode=OneWay}" IsReadOnly="True" IsReadOnlyCaretVisible="True" 
+                  MaxLength="30" Name="textBoxElement" Background="#1D1D1D" TextElement.Foreground="White" 
+                  Height="30"  
+                  Visibility="{Binding TextBoxVisibility}" />
         <ListView Name="programList" 
               Background="#1D1D1D" 
               TextElement.Foreground="White"

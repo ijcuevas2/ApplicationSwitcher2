@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Controls;
 using System.Collections.ObjectModel;
 using System.Runtime.InteropServices;
 using System.Diagnostics;
@@ -19,7 +20,9 @@ namespace WpfApp1
         public event PropertyChangedEventHandler PropertyChanged;
         sealed class CallerMemberNameAttribute: Attribute { }
         ObservableCollection<WindowSummary> windowSummaries = null;
+        ObservableCollection<WindowSummary> filteredWindowSummaries = null;
         public Boolean isKeyboardShortcut = false;
+        public int prevCaretIndex = 0;
 
         private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
         {
@@ -83,6 +86,88 @@ namespace WpfApp1
             TextBoxVisibility = "Collapsed";
         }
 
+        private String _text = "";
+        public String Text
+        {
+            get { return _text;  }
+            set
+            {
+                if (_text != value)
+                {
+                    _text = value;
+                    // textBoxElement.CaretIndex = 2;
+
+                    this.NotifyPropertyChanged();
+                    this.updateWindowSummaries();
+                    this.incrementCursorIndex();
+                }
+            }
+        }
+        
+        // NOTE: notify property changed is not necessary here
+        // used after updating text length
+        private int _caretIndex;
+        public int CaretIndex
+        {
+            get { return _caretIndex; }
+            set
+            {
+                if (value < 0)
+                {
+                    _caretIndex = 0;
+                }
+
+                if (_caretIndex >  Text.Length)
+                {
+                    _caretIndex = Text.Length;
+                }
+            }
+        }
+
+        public int getCurrCaratIndex()
+        {
+            return textBoxElement.CaretIndex;
+        }
+
+        public void updateWindowSummaries()
+        {
+            Console.WriteLine("updateWindowSummaries!!");
+            // filteredWindowSummaries = new ObservableCollection<WindowSummary>();
+            filteredWindowSummaries.Clear();
+            for (int i = 0; i < windowSummaries.Count; i++)
+            {
+                String programName = windowSummaries[i].ProgramName.ToLower();
+                String programWindowTitle = windowSummaries[i].ProgramWindowTitle.ToLower();
+
+                String filterText = Text.ToLower();
+
+                // TODO: Change name of variable
+                Boolean isRelevantProgram = programName.Contains(Text) ||
+                                            programWindowTitle.Contains(Text);
+                if (isRelevantProgram)
+                {
+                    filteredWindowSummaries.Add(windowSummaries[i]);
+                }
+            }
+
+        }
+
+        public void decrementCursorIndex()
+        {
+            CaretIndex = getCurrCaratIndex();
+            CaretIndex--;
+            textBoxElement.CaretIndex = CaretIndex;
+        }
+
+        public void incrementCursorIndex()
+        {
+            // Console.WriteLine("Before CaratIndex: {0}", textBoxElement.CaretIndex);
+            CaretIndex = getCurrCaratIndex();
+            CaretIndex++;
+            textBoxElement.CaretIndex = CaretIndex;
+            // Console.WriteLine("After CaratIndex: {0}", textBoxElement.CaretIndex);
+        }
+
         public MainWindow()
         {
 
@@ -98,7 +183,16 @@ namespace WpfApp1
             // TODO: Refactor this
             List<Process> mainProcessList = WindowSummaryManager.GetRunningPrograms();
             this.windowSummaries = WindowSummaryManager.getWindowSummaryInfo(mainProcessList);
-            programList.ItemsSource = this.windowSummaries;
+
+            this.filteredWindowSummaries = new ObservableCollection<WindowSummary>();
+
+            for (int i = 0; i < windowSummaries.Count; i++)
+            {
+                this.filteredWindowSummaries.Add(this.windowSummaries[i]);
+            }
+
+
+            programList.ItemsSource = filteredWindowSummaries;
             // programList.MouseEnter += new MouseEventHandler(Mouse_Enter);
             Window window = Application.Current.MainWindow;
             DataContext = this;
@@ -120,10 +214,6 @@ namespace WpfApp1
                 e.Handled = true;
             }
 
-            if (e.Key == Key.Escape)
-            {
-                MainWindow_Hide();
-            }
 
             Boolean isAlphaNumeric = isAlphaNumericKeyPress(e.Key);
 
@@ -135,12 +225,45 @@ namespace WpfApp1
 
         public Boolean isAlphaNumericKeyPress(Key key)
         {
-            int keyValue = (int)key;
+            // int keyValue = (int)key;
+            String keyString = key.ToString();
+            if (keyString.Length != 1)
+            {
+                return false;
+            }
+
+            char currChar = keyString[0];
+
+            // Console.Write("keyValue: {0}", keyValue);
+            Console.Write("currChar: {0}", currChar);
+            Console.Write("key: {0}, key.ToString(): {1}", key, key.ToString());
 
             // letters, numbers, keypad
-            return ((keyValue >= 0x30 && keyValue <= 0x39))
-                || ((keyValue >= 0x41 && keyValue <= 0x5A))
-                || ((keyValue >= 0x60 && keyValue <= 0x69));
+            return ((currChar >= 'A' && currChar <= 'Z'))
+                || ((currChar >= 'a' && currChar <= 'z'))
+                || ((currChar >= '0' && currChar <= '9'));
+        }
+
+        public Boolean isSpace(Key key)
+        {
+            // Console.WriteLine("key.ToString(): {0}", key.ToString());
+            if (key == Key.Space)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        public Boolean isBackSpace(Key key)
+        {
+            // Console.WriteLine("key.ToString(): {0}", key.ToString());
+            if (key == Key.Back)
+            {
+                return true;
+            }
+
+            return false;
         }
 
         private void PreviewMouse_Move(object sender, MouseEventArgs e)
@@ -217,11 +340,70 @@ namespace WpfApp1
                     Console.WriteLine("lParam.vkCode: {0}", lParam.vkCode);
                     Key currentKey = KeyInterop.KeyFromVirtualKey(lParam.vkCode);
                     Console.WriteLine("isAlphaNumericKeyPress(currentKey): {0}", isAlphaNumericKeyPress(currentKey));
+                    Console.WriteLine("isSpace(currentKey): {0}", isSpace(currentKey));
+                    Console.WriteLine("Text: {0}", Text);
+                    Boolean isShiftKey = (Keyboard.Modifiers & ModifierKeys.Shift) != 0;
+                    Boolean isAlt = lParam.flags == 32;
+                    Console.WriteLine("isAlt: {0}", isAlt);
+
+                    if (isBackSpace(currentKey))
+                    {
+                        if (Text.Length > 0)
+                        {
+                            int index = getCurrCaratIndex();
+                            // String firstSection = Text.Substring();
+                            Text = Text.Substring(0, Text.Length - 1);
+                        }
+
+                        goto NextHook;
+                    }
+
+                    // if (isSpace(currentKey))
+                    // {
+                    //     char currChar = ' ';
+                    //     Text += currChar;
+                    //     // textBoxElement.CaretIndex = Text.Length - 1;
+
+                    //     if (isAlt)
+                    //     {
+                    //         return 1;
+                    //     }
+
+                    //     goto NextHook;
+                    // }
+
+                    if (currentKey == Key.RightShift)
+                    {
+                        // MainWindow_Hide();
+                        Console.WriteLine("Text: {0}", Text);
+                        Console.WriteLine("Hello!");
+                        Console.WriteLine("textBoxElement.Text: {0}", textBoxElement.Text);
+                        Console.WriteLine("textBoxElement.CaretIndx: {0}", textBoxElement.CaretIndex);
+                    }
+
+                    if (currentKey == Key.LeftShift)
+                    {
+                        textBoxElement.CaretIndex += 1;
+                    }
+
                     if (isAlphaNumericKeyPress(currentKey))
                     {
                         setTextBoxVisible();
-                        return 1;
+
+                        char currChar = currentKey.ToString()[0];
+
+                        if (!isShiftKey)
+                        {
+                            currChar = Char.ToLower(currChar);
+                        }
+
+                        Text += currChar;
+
+                        // NOTE: this is the fix
+                        goto NextHook;
                     }
+
+                    // else if
 
                     // Console.WriteLine("Mod", lParam.vkCode);
                     Boolean isAltTab = lParam.vkCode == 0x09 && lParam.flags == 32;
@@ -229,7 +411,6 @@ namespace WpfApp1
                     {
                         this.ShowMainWindow();
                         isKeyboardShortcut = true;
-                        Boolean isShiftKey = (Keyboard.Modifiers & ModifierKeys.Shift) != 0;
                         Console.WriteLine("isShiftKey: {0}", isShiftKey);
                         if (isShiftKey) {
                             Console.WriteLine("Pressing Alt + Shift + Tab");
@@ -256,12 +437,12 @@ namespace WpfApp1
                     if (isAlt)
                     {
                         // MainWindow_Hide();
-                        // return 1;
+                        return 1;
                     }
-
                 }
             }
 
+            NextHook:
             return CallNextHookEx(0, nCode, wParam, ref lParam);
         }
 
@@ -288,7 +469,8 @@ namespace WpfApp1
         {
             Console.WriteLine("MainWindow_Hide()");
             setTextBoxCollapsed();
-            this.Hide();
+            Text = "";
+            // this.Hide();
         }
 
         // TODO: Figure out that this gets called properly
