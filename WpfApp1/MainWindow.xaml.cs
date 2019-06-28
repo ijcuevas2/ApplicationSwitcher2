@@ -99,7 +99,7 @@ namespace WpfApp1
 
                     this.NotifyPropertyChanged();
                     this.updateWindowSummaries();
-                    this.incrementCursorIndex();
+                    // this.incrementCursorIndex();
                 }
             }
         }
@@ -162,9 +162,10 @@ namespace WpfApp1
         public void incrementCursorIndex()
         {
             // Console.WriteLine("Before CaratIndex: {0}", textBoxElement.CaretIndex);
-            CaretIndex = getCurrCaratIndex();
-            CaretIndex++;
-            textBoxElement.CaretIndex = CaretIndex;
+            // CaretIndex = getCurrCaratIndex();
+            // CaretIndex+;
+            // textBoxElement.CaretIndex = CaretIndex;
+            textBoxElement.ScrollToEnd();
             // Console.WriteLine("After CaratIndex: {0}", textBoxElement.CaretIndex);
         }
 
@@ -379,6 +380,7 @@ namespace WpfApp1
                         Console.WriteLine("Hello!");
                         Console.WriteLine("textBoxElement.Text: {0}", textBoxElement.Text);
                         Console.WriteLine("textBoxElement.CaretIndx: {0}", textBoxElement.CaretIndex);
+                        textBoxElement.ScrollToEnd();
                     }
 
                     if (currentKey == Key.LeftShift)
@@ -398,12 +400,12 @@ namespace WpfApp1
                         }
 
                         Text += currChar;
+                        // textBoxElement.Car;
+                        // textBoxElement.Text += currChar;
 
                         // NOTE: this is the fix
                         goto NextHook;
                     }
-
-                    // else if
 
                     // Console.WriteLine("Mod", lParam.vkCode);
                     Boolean isAltTab = lParam.vkCode == 0x09 && lParam.flags == 32;
@@ -444,6 +446,11 @@ namespace WpfApp1
 
             NextHook:
             return CallNextHookEx(0, nCode, wParam, ref lParam);
+        }
+
+        public void Main_TextChanged(object sender, EventArgs e)
+        {
+            Console.WriteLine("TextChanged!: {0}", textBoxElement.Text);
         }
 
         public void ShowMainWindow()
