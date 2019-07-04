@@ -169,6 +169,12 @@ namespace WpfApp1
             // Console.WriteLine("After CaratIndex: {0}", textBoxElement.CaretIndex);
         }
 
+        // public static readonly DependencyProperty NonIntrusiveTextProperty;
+
+        public class TextBoxExtensions
+        {
+        }
+
         public MainWindow()
         {
 
