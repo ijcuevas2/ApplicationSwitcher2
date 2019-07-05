@@ -20,12 +20,16 @@
         </Style>
     </Window.Resources>
     <StackPanel>
-        <!--TODO: refactor this portion later   -->
-        <TextBox  Text="{Binding Text, Mode=OneWay}" IsReadOnly="True" IsReadOnlyCaretVisible="True" 
+        <!--
+        TODO: refactor this portion later   
+        local:TextBoxExtensions.NonIntrusiveText="{Binding Text, 
+                                        UpdateSourceTrigger=PropertyChanged, 
+                                        Mode=TwoWay}"
+        -->
+        <TextBox  Text="{Binding Text, Mode=OneWay}" IsReadOnly="True" IsReadOnlyCaretVisible="True"
                   MaxLength="30" Name="textBoxElement" Background="#1D1D1D" TextElement.Foreground="White" 
                   Height="30"  
                   Visibility="{Binding TextBoxVisibility}" 
-                  local:TextBoxExtensions.NonIntrusiveText="{Binding Text, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                   />
         <ListView Name="programList" 
               Background="#1D1D1D" 

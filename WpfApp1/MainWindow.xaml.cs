@@ -99,7 +99,7 @@ namespace WpfApp1
 
                     this.NotifyPropertyChanged();
                     this.updateWindowSummaries();
-                    // this.incrementCursorIndex();
+                    this.incrementCursorIndex();
                 }
             }
         }
@@ -117,9 +117,11 @@ namespace WpfApp1
                     _caretIndex = 0;
                 }
 
-                if (_caretIndex >  Text.Length)
+                int targetIndex = Text.Length + 1;
+
+                if (_caretIndex >  targetIndex)
                 {
-                    _caretIndex = Text.Length;
+                    _caretIndex = targetIndex;
                 }
             }
         }
@@ -138,7 +140,6 @@ namespace WpfApp1
             {
                 String programName = windowSummaries[i].ProgramName.ToLower();
                 String programWindowTitle = windowSummaries[i].ProgramWindowTitle.ToLower();
-
                 String filterText = Text.ToLower();
 
                 // TODO: Change name of variable
@@ -161,18 +162,13 @@ namespace WpfApp1
 
         public void incrementCursorIndex()
         {
-            // Console.WriteLine("Before CaratIndex: {0}", textBoxElement.CaretIndex);
             // CaretIndex = getCurrCaratIndex();
-            // CaretIndex+;
-            // textBoxElement.CaretIndex = CaretIndex;
-            textBoxElement.ScrollToEnd();
+            // CaretIndex = 2;
+            Console.WriteLine("prevCaretIndex Before Increment: {0}", prevCaretIndex);
+            prevCaretIndex++;
+            Console.WriteLine("prevCaretIndex After Increment: {0}", prevCaretIndex);
+            textBoxElement.CaretIndex = prevCaretIndex;
             // Console.WriteLine("After CaratIndex: {0}", textBoxElement.CaretIndex);
-        }
-
-        // public static readonly DependencyProperty NonIntrusiveTextProperty;
-
-        public class TextBoxExtensions
-        {
         }
 
         public MainWindow()
@@ -241,9 +237,8 @@ namespace WpfApp1
 
             char currChar = keyString[0];
 
-            // Console.Write("keyValue: {0}", keyValue);
-            Console.Write("currChar: {0}", currChar);
-            Console.Write("key: {0}, key.ToString(): {1}", key, key.ToString());
+            Console.WriteLine("currChar: {0}", currChar);
+            Console.WriteLine("key: {0}, key.ToString(): {1}", key, key.ToString());
 
             // letters, numbers, keypad
             return ((currChar >= 'A' && currChar <= 'Z'))
@@ -334,6 +329,8 @@ namespace WpfApp1
         private int LowLevelKeyboardProc(int nCode, int wParam, ref KBDLLHOOKSSTRUCT lParam)
         {
             // Console.WriteLine("LowLevelKeyboardProc");
+            CaretIndex = getCurrCaratIndex();
+
             if (nCode >= 0)
             {
                 // Console.WriteLine("wParam: {0}", wParam);
@@ -357,9 +354,11 @@ namespace WpfApp1
                     {
                         if (Text.Length > 0)
                         {
-                            int index = getCurrCaratIndex();
-                            // String firstSection = Text.Substring();
-                            Text = Text.Substring(0, Text.Length - 1);
+                            int SelectionStart = textBoxElement.SelectionStart;
+                            int SelectionEnd = textBoxElement.SelectionStart + textBoxElement.SelectionLength;
+                            Text = Text.Substring(0, SelectionStart - 1) + Text.Substring(SelectionEnd);
+                            CaretIndex = getCurrCaratIndex();
+                            
                         }
 
                         goto NextHook;
@@ -382,11 +381,13 @@ namespace WpfApp1
                     if (currentKey == Key.RightShift)
                     {
                         // MainWindow_Hide();
-                        Console.WriteLine("Text: {0}", Text);
-                        Console.WriteLine("Hello!");
-                        Console.WriteLine("textBoxElement.Text: {0}", textBoxElement.Text);
-                        Console.WriteLine("textBoxElement.CaretIndx: {0}", textBoxElement.CaretIndex);
-                        textBoxElement.ScrollToEnd();
+                        Console.WriteLine("textBoxElement.SelectionStart: {0}", textBoxElement.SelectionStart);
+                        Console.WriteLine("textBoxElement.SelectionLength: {0}", textBoxElement.SelectionLength);
+                        // int SelectionStart = textBoxElement.SelectionStart;
+                        // int SelectionEnd = textBoxElement.SelectionStart + textBoxElement.SelectionLength;
+                        // Text.Substring(0, SelectionStart - 1);
+                        // textBoxElement.CaretIndex = 3;
+                        // incrementCursorIndex();
                     }
 
                     if (currentKey == Key.LeftShift)
@@ -407,7 +408,10 @@ namespace WpfApp1
 
                         Text += currChar;
                         // textBoxElement.Car;
-                        // textBoxElement.Text += currChar;
+                        // if (isAlt)
+                        // {
+                        //     textBoxElement.Text += currChar;
+                        // }
 
                         // NOTE: this is the fix
                         goto NextHook;
@@ -453,6 +457,17 @@ namespace WpfApp1
             NextHook:
             return CallNextHookEx(0, nCode, wParam, ref lParam);
         }
+
+        // public void textBoxCursor()
+        // {
+        //     var caretIndex = textBoxElement.CaretIndex;
+        //     var selectionStart = textBoxElement.SelectionStart;
+        //     var selectionLength = textBoxElement.SelectionLength;
+        //     textBoxElement.Text = (string)textBoxElement.Text;
+        //     textBoxElement.CaretIndex = caretIndex;
+        //     textBoxElement.SelectionStart = selectionStart;
+        //     textBoxElement.SelectionLength = selectionLength;
+        // }
 
         public void Main_TextChanged(object sender, EventArgs e)
         {
