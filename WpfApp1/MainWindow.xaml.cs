@@ -94,12 +94,21 @@ namespace WpfApp1
             {
                 if (_text != value)
                 {
+                    Boolean addingText = value.Length > _text.Length;
                     _text = value;
                     // textBoxElement.CaretIndex = 2;
 
                     this.NotifyPropertyChanged();
                     this.updateWindowSummaries();
-                    this.incrementCursorIndex();
+                    if (addingText)
+                    {
+                        this.incrementCursorIndex();
+                    }
+
+                    else
+                    {
+                        this.decrementCursorIndex();
+                    }
                 }
             }
         }
@@ -115,18 +124,24 @@ namespace WpfApp1
                 if (value < 0)
                 {
                     _caretIndex = 0;
+                    return;
                 }
 
                 int targetIndex = Text.Length + 1;
 
-                if (_caretIndex >  targetIndex)
+                if (_caretIndex > targetIndex)
                 {
                     _caretIndex = targetIndex;
+                }
+
+                else
+                {
+                    _caretIndex = value;
                 }
             }
         }
 
-        public int getCurrCaratIndex()
+        public int getCurrCaretIndex()
         {
             return textBoxElement.CaretIndex;
         }
@@ -155,8 +170,8 @@ namespace WpfApp1
 
         public void decrementCursorIndex()
         {
-            CaretIndex = getCurrCaratIndex();
-            CaretIndex--;
+            CaretIndex -= 1;
+            Console.WriteLine("CaretIndex (decrement cursor): {0}", CaretIndex);
             textBoxElement.CaretIndex = CaretIndex;
         }
 
@@ -164,10 +179,10 @@ namespace WpfApp1
         {
             // CaretIndex = getCurrCaratIndex();
             // CaretIndex = 2;
-            Console.WriteLine("prevCaretIndex Before Increment: {0}", prevCaretIndex);
-            prevCaretIndex++;
-            Console.WriteLine("prevCaretIndex After Increment: {0}", prevCaretIndex);
-            textBoxElement.CaretIndex = prevCaretIndex;
+            Console.WriteLine("CaretIndex Before Increment: {0}", prevCaretIndex);
+            CaretIndex++;
+            Console.WriteLine("CaretIndex After Increment: {0}", prevCaretIndex);
+            textBoxElement.CaretIndex = CaretIndex;
             // Console.WriteLine("After CaratIndex: {0}", textBoxElement.CaretIndex);
         }
 
@@ -268,6 +283,21 @@ namespace WpfApp1
             return false;
         }
 
+        public Boolean isDelete(Key key)
+        {
+            if (key == Key.Delete)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        public Boolean isKeyEquals(Key first, Key second)
+        {
+            return first == second;
+        }
+
         private void PreviewMouse_Move(object sender, MouseEventArgs e)
         {
             if (isKeyboardShortcut)
@@ -326,14 +356,21 @@ namespace WpfApp1
             }
         }
 
+        public void setCaretIndex(int index)
+        {
+            CaretIndex = index;
+            textBoxElement.CaretIndex = CaretIndex;
+        }
+
         private int LowLevelKeyboardProc(int nCode, int wParam, ref KBDLLHOOKSSTRUCT lParam)
         {
             // Console.WriteLine("LowLevelKeyboardProc");
-            CaretIndex = getCurrCaratIndex();
+            CaretIndex = getCurrCaretIndex();
+            Console.WriteLine("CaretIndex: {0}", CaretIndex);
+            Console.WriteLine("textBoxElement.CaretIndex:{0}", textBoxElement.CaretIndex);
 
             if (nCode >= 0)
             {
-                // Console.WriteLine("wParam: {0}", wParam);
                 Boolean isKeyDown = wParam == 256 || wParam == 260;
                 Boolean isKeyUp = wParam == 257 || wParam == 261;
                 if (isKeyDown)
@@ -341,27 +378,75 @@ namespace WpfApp1
                     // case 256: // WM_KEYDOWN
                     // case 260: // WM_SYSKEYDOWN
                     // Console.WriteLine("Pressing Shift?: {0}", (lParam.vkCode == 0xA0 || lParam.vkCode == 0xA1));
-                    Console.WriteLine("lParam.vkCode: {0}", lParam.vkCode);
+                    // Console.WriteLine("lParam.vkCode: {0}", lParam.vkCode);
                     Key currentKey = KeyInterop.KeyFromVirtualKey(lParam.vkCode);
-                    Console.WriteLine("isAlphaNumericKeyPress(currentKey): {0}", isAlphaNumericKeyPress(currentKey));
-                    Console.WriteLine("isSpace(currentKey): {0}", isSpace(currentKey));
-                    Console.WriteLine("Text: {0}", Text);
+                    // Console.WriteLine("isAlphaNumericKeyPress(currentKey): {0}", isAlphaNumericKeyPress(currentKey));
+                    // Console.WriteLine("isSpace(currentKey): {0}", isSpace(currentKey));
+                    // Console.WriteLine("Text: {0}", Text);
                     Boolean isShiftKey = (Keyboard.Modifiers & ModifierKeys.Shift) != 0;
                     Boolean isAlt = lParam.flags == 32;
-                    Console.WriteLine("isAlt: {0}", isAlt);
+                    Boolean isCtrlModifier = (Keyboard.Modifiers & ModifierKeys.Control) != 0;
+                    Boolean isAltModifier = (Keyboard.Modifiers & ModifierKeys.Alt) != 0;
+                    // Console.WriteLine("isAlt: {0}", isAlt);
 
-                    if (isBackSpace(currentKey))
+                    if (isCtrlModifier && isKeyEquals(currentKey, Key.A))
+                    {
+                        goto NextHook;
+                    }
+
+                    if (isKeyEquals(currentKey, Key.Back))
                     {
                         if (Text.Length > 0)
                         {
-                            int SelectionStart = textBoxElement.SelectionStart;
+                            int selectionStart = textBoxElement.SelectionStart;
+                            int selectionLength = textBoxElement.SelectionLength;
                             int SelectionEnd = textBoxElement.SelectionStart + textBoxElement.SelectionLength;
-                            Text = Text.Substring(0, SelectionStart - 1) + Text.Substring(SelectionEnd);
-                            CaretIndex = getCurrCaratIndex();
-                            
+                            // CaretIndex = getCurrCaretIndex();
+                            Console.WriteLine("CaretIndex (In Backspace): {0}", CaretIndex);
+
+                            if (selectionLength > 0)
+                            {
+                                setCaretIndex(selectionStart + 1);
+                                Text = Text.Substring(0, selectionStart) + Text.Substring(SelectionEnd);
+                            }
+
+                            else if (selectionStart != 0)
+                            {
+                                Text = Text.Substring(0, selectionStart - 1) + Text.Substring(SelectionEnd);
+                            }
+
+                            else if (SelectionEnd == Text.Length)
+                            {
+                                Text = "";
+                                setCaretIndex(0);
+                            }
+
+                            else 
+                            {
+                                Text = Text.Substring(SelectionEnd);
+                            }
                         }
 
                         goto NextHook;
+                    }
+
+                    // TODO: make a dependency property
+                    if (isKeyEquals(currentKey, Key.Home))
+                    {
+                        CaretIndex = 0;
+                    }
+
+                    if (isKeyEquals(currentKey, Key.Delete))
+                    {
+                        Boolean lastIndex = Text.Length == CaretIndex;
+                        if (Text.Length > 0 && !lastIndex)
+                        {
+                            int SelectionStart = textBoxElement.SelectionStart;
+                            int SelectionEnd = textBoxElement.SelectionStart + textBoxElement.SelectionLength;
+
+                            Text = Text.Substring(0, SelectionStart) + Text.Substring(SelectionEnd + 1);
+                            incrementCursorIndex();
+                        }
                     }
 
                     // if (isSpace(currentKey))
@@ -378,21 +463,25 @@ namespace WpfApp1
                     //     goto NextHook;
                     // }
 
-                    if (currentKey == Key.RightShift)
+                    if (isKeyEquals(currentKey, Key.RightShift))
                     {
                         // MainWindow_Hide();
                         Console.WriteLine("textBoxElement.SelectionStart: {0}", textBoxElement.SelectionStart);
                         Console.WriteLine("textBoxElement.SelectionLength: {0}", textBoxElement.SelectionLength);
-                        // int SelectionStart = textBoxElement.SelectionStart;
-                        // int SelectionEnd = textBoxElement.SelectionStart + textBoxElement.SelectionLength;
-                        // Text.Substring(0, SelectionStart - 1);
-                        // textBoxElement.CaretIndex = 3;
-                        // incrementCursorIndex();
                     }
 
-                    if (currentKey == Key.LeftShift)
+                    // TODO: check for unnecessary decrementing or incrementing
+                    if (isAltModifier)
                     {
-                        textBoxElement.CaretIndex += 1;
+                        if (isKeyEquals(currentKey, Key.Left))
+                        {
+                            decrementCursorIndex();
+                        }
+
+                        if (isKeyEquals(currentKey, Key.Right))
+                        {
+                            incrementCursorIndex();
+                        }
                     }
 
                     if (isAlphaNumericKeyPress(currentKey))
@@ -446,10 +535,11 @@ namespace WpfApp1
                     Boolean isAlt = lParam.vkCode == 0xA4 || lParam.vkCode == 0xA5;
                     // Console.WriteLine("isAlt: {0}", isAlt);
                     // Console.WriteLine("lParam.vkCode: {0}", lParam.vkCode);
+                    // NOTE: Be Careful
                     if (isAlt)
                     {
                         // MainWindow_Hide();
-                        return 1;
+                        // return goTo;
                     }
                 }
             }
@@ -457,17 +547,6 @@ namespace WpfApp1
             NextHook:
             return CallNextHookEx(0, nCode, wParam, ref lParam);
         }
-
-        // public void textBoxCursor()
-        // {
-        //     var caretIndex = textBoxElement.CaretIndex;
-        //     var selectionStart = textBoxElement.SelectionStart;
-        //     var selectionLength = textBoxElement.SelectionLength;
-        //     textBoxElement.Text = (string)textBoxElement.Text;
-        //     textBoxElement.CaretIndex = caretIndex;
-        //     textBoxElement.SelectionStart = selectionStart;
-        //     textBoxElement.SelectionLength = selectionLength;
-        // }
 
         public void Main_TextChanged(object sender, EventArgs e)
         {
