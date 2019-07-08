@@ -158,14 +158,13 @@ namespace WpfApp1
                 String filterText = Text.ToLower();
 
                 // TODO: Change name of variable
-                Boolean isRelevantProgram = programName.Contains(Text) ||
-                                            programWindowTitle.Contains(Text);
+                Boolean isRelevantProgram = programName.Contains(filterText) ||
+                                            programWindowTitle.Contains(filterText);
                 if (isRelevantProgram)
                 {
                     filteredWindowSummaries.Add(windowSummaries[i]);
                 }
             }
-
         }
 
         public void decrementCursorIndex()
@@ -188,7 +187,6 @@ namespace WpfApp1
 
         public MainWindow()
         {
-
             InitializeComponent();
 
             // TODO: figure out what this does
