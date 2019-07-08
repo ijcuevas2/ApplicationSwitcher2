@@ -8,7 +8,7 @@
         Title="MainWindow" Height="Auto" 
         Width="Auto" 
         SizeToContent="WidthAndHeight">
-         <!-- ShowInTaskbar="False"-->
+    <!-- ShowInTaskbar="False"-->
     <Window.Resources>
         <Style TargetType="ListViewItem">
             <Setter Property="HorizontalContentAlignment" Value="Stretch" />
@@ -17,6 +17,88 @@
         <Style TargetType="{x:Type Window}">
             <Setter Property="FontFamily" Value="Segoe UI" />
             <Setter Property="FontSize" Value="18" />
+        </Style>
+        <!--x:Key="ListViewItemControlTemplate1"-->
+        <Style x:Key="ListViewContainerStyle" TargetType="{x:Type ListViewItem}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ListViewItem}">
+                        <Border BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" CornerRadius="2" SnapsToDevicePixels="True">
+                            <Border x:Name="InnerBorder" BorderThickness="1" CornerRadius="1">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition MaxHeight="11"/>
+                                        <RowDefinition/>
+                                    </Grid.RowDefinitions>
+                                    <Rectangle x:Name="UpperHighlight" Fill="#75FFFFFF" Visibility="Collapsed"/>
+                                    <GridViewRowPresenter Columns="{TemplateBinding GridView.ColumnCollection}" Content="{TemplateBinding Content}" Grid.RowSpan="2" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                                </Grid>
+                            </Border>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <!--<Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background">
+                                    <Setter.Value>
+                                        <LinearGradientBrush EndPoint="0,1" StartPoint="0,0">
+                                            <GradientStop Color="#FFF1FBFF" Offset="0"/>
+                                            <GradientStop Color="#FFD5F1FE" Offset="1"/>
+                                        </LinearGradientBrush>
+                                    </Setter.Value>
+                                </Setter>
+                                <Setter Property="BorderBrush" Value="#FFCCF0FF"/>
+                                <Setter Property="Visibility" TargetName="UpperHighlight" Value="Visible"/>
+                            </Trigger>-->
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter Property="Background">
+                                    <Setter.Value>
+                                        <LinearGradientBrush EndPoint="0,1" StartPoint="0,0">
+                                            <GradientStop Color="#FFD9F4FF" Offset="0"/>
+                                            <GradientStop Color="#FF9BDDFB" Offset="1"/>
+                                        </LinearGradientBrush>
+                                    </Setter.Value>
+                                </Setter>
+                                <Setter Property="BorderBrush" Value="#FF98DDFB"/>
+                                <Setter Property="BorderBrush" TargetName="InnerBorder" Value="#80FFFFFF"/>
+                                <Setter Property="Visibility" TargetName="UpperHighlight" Value="Visible"/>
+                                <Setter Property="Fill" TargetName="UpperHighlight" Value="#40FFFFFF"/>
+                            </Trigger>
+                            <!--<MultiTrigger>
+                                <MultiTrigger.Conditions>
+                                    <Condition Property="IsSelected" Value="True"/>
+                                    <Condition Property="Selector.IsSelectionActive" Value="False"/>
+                                </MultiTrigger.Conditions>
+                                <Setter Property="Background">
+                                    <Setter.Value>
+                                        <LinearGradientBrush EndPoint="0,1" StartPoint="0,0">
+                                            <GradientStop Color="#FFEEEDED" Offset="0"/>
+                                            <GradientStop Color="#FFDDDDDD" Offset="1"/>
+                                        </LinearGradientBrush>
+                                    </Setter.Value>
+                                </Setter>
+                                <Setter Property="BorderBrush" Value="#FFCFCFCF"/>
+                            </MultiTrigger>-->
+                            <!--<MultiTrigger>
+                                <MultiTrigger.Conditions>
+                                    <Condition Property="IsSelected" Value="True"/>
+                                    <Condition Property="IsMouseOver" Value="True"/>
+                                </MultiTrigger.Conditions>
+                                <Setter Property="Background">
+                                    <Setter.Value>
+                                        <LinearGradientBrush EndPoint="0,1" StartPoint="0,0">
+                                            <GradientStop Color="#FFEAF9FF" Offset="0"/>
+                                            <GradientStop Color="#FFC9EDFD" Offset="1"/>
+                                        </LinearGradientBrush>
+                                    </Setter.Value>
+                                </Setter>
+                                <Setter Property="BorderBrush" Value="#FF98DDFB"/>
+                            </MultiTrigger>-->
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
         </Style>
     </Window.Resources>
     <StackPanel>
@@ -36,21 +118,8 @@
               TextElement.Foreground="White"
               SelectedIndex="{Binding Path=ProgramIndex}"
               SelectionMode="Single"
-              PreviewMouseMove="PreviewMouse_Move">
-            <!-- <ListView.ItemContainerStyle>
-                <Style TargetType="ListViewItem">
-                    <Setter Property="SnapsToDevicePixels" 
-                            Value="True"/>
-                    <Setter Property="OverridesDefaultStyle" 
-                            Value="True"/>
-                    <Setter Property="Template">
-                        <Setter.Value>
-                            <ControlTemplate TargetType="ListBoxItem">
-                            </ControlTemplate>
-                        </Setter.Value>
-                    </Setter>
-                </Style>
-            </ListView.ItemContainerStyle> -->
+              PreviewMouseMove="PreviewMouse_Move"
+              ItemContainerStyle="{DynamicResource ListViewContainerStyle}">
             <ListView.View>
                 <GridView>
                     <GridView.ColumnHeaderContainerStyle>
@@ -81,6 +150,7 @@
                     </GridViewColumn>
                 </GridView>
             </ListView.View>
+            <!-- <ListViewItem Content="ListViewItem" Margin="0" Template="{DynamicResource ListViewItemControlTemplate1}"/> -->
         </ListView>
     </StackPanel>
 </Window>

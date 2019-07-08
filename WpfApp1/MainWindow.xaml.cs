@@ -454,12 +454,10 @@ namespace WpfApp1
                     //     char currChar = ' ';
                     //     Text += currChar;
                     //     // textBoxElement.CaretIndex = Text.Length - 1;
-
                     //     if (isAlt)
                     //     {
                     //         return 1;
                     //     }
-
                     //     goto NextHook;
                     // }
 
@@ -536,11 +534,10 @@ namespace WpfApp1
                     // Console.WriteLine("isAlt: {0}", isAlt);
                     // Console.WriteLine("lParam.vkCode: {0}", lParam.vkCode);
                     // NOTE: Be Careful
-                    if (isAlt)
-                    {
-                        // MainWindow_Hide();
-                        // return goTo;
-                    }
+                    // if (isAlt)
+                    // {
+                    //     MainWindow_Hide();
+                    // }
                 }
             }
 
@@ -555,29 +552,12 @@ namespace WpfApp1
 
         public void ShowMainWindow()
         {
-            // Console.WriteLine("MainWindow_Show()");
-            // Console.WriteLine("this.IsVisible: {0}", this.IsVisible);
-            // if (this.IsVisible)
-            // {
-            //     if (this.WindowState == WindowState.Minimized)
-            //     {
-            //         this.WindowState = WindowState.Normal;
-            //     }
-            //     else
-            //     {
-            //         this.Show();
-            //     }
-            // }
-
             this.Show();
         }
 
         public void MainWindow_Hide()
         {
-            Console.WriteLine("MainWindow_Hide()");
-            setTextBoxCollapsed();
-            Text = "";
-            // this.Hide();
+            this.Hide();
         }
 
         // TODO: Figure out that this gets called properly
