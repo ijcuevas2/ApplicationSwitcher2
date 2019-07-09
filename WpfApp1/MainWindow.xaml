@@ -18,7 +18,6 @@
             <Setter Property="FontFamily" Value="Segoe UI" />
             <Setter Property="FontSize" Value="18" />
         </Style>
-        <!--x:Key="ListViewItemControlTemplate1"-->
         <Style x:Key="ListViewContainerStyle" TargetType="{x:Type ListViewItem}">
             <Setter Property="Template">
                 <Setter.Value>
@@ -36,18 +35,6 @@
                             </Border>
                         </Border>
                         <ControlTemplate.Triggers>
-                            <!--<Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Background">
-                                    <Setter.Value>
-                                        <LinearGradientBrush EndPoint="0,1" StartPoint="0,0">
-                                            <GradientStop Color="#FFF1FBFF" Offset="0"/>
-                                            <GradientStop Color="#FFD5F1FE" Offset="1"/>
-                                        </LinearGradientBrush>
-                                    </Setter.Value>
-                                </Setter>
-                                <Setter Property="BorderBrush" Value="#FFCCF0FF"/>
-                                <Setter Property="Visibility" TargetName="UpperHighlight" Value="Visible"/>
-                            </Trigger>-->
                             <Trigger Property="IsSelected" Value="True">
                                 <Setter Property="Background">
                                     <Setter.Value>
@@ -62,36 +49,6 @@
                                 <Setter Property="Visibility" TargetName="UpperHighlight" Value="Visible"/>
                                 <Setter Property="Fill" TargetName="UpperHighlight" Value="#40FFFFFF"/>
                             </Trigger>
-                            <!--<MultiTrigger>
-                                <MultiTrigger.Conditions>
-                                    <Condition Property="IsSelected" Value="True"/>
-                                    <Condition Property="Selector.IsSelectionActive" Value="False"/>
-                                </MultiTrigger.Conditions>
-                                <Setter Property="Background">
-                                    <Setter.Value>
-                                        <LinearGradientBrush EndPoint="0,1" StartPoint="0,0">
-                                            <GradientStop Color="#FFEEEDED" Offset="0"/>
-                                            <GradientStop Color="#FFDDDDDD" Offset="1"/>
-                                        </LinearGradientBrush>
-                                    </Setter.Value>
-                                </Setter>
-                                <Setter Property="BorderBrush" Value="#FFCFCFCF"/>
-                            </MultiTrigger>-->
-                            <!--<MultiTrigger>
-                                <MultiTrigger.Conditions>
-                                    <Condition Property="IsSelected" Value="True"/>
-                                    <Condition Property="IsMouseOver" Value="True"/>
-                                </MultiTrigger.Conditions>
-                                <Setter Property="Background">
-                                    <Setter.Value>
-                                        <LinearGradientBrush EndPoint="0,1" StartPoint="0,0">
-                                            <GradientStop Color="#FFEAF9FF" Offset="0"/>
-                                            <GradientStop Color="#FFC9EDFD" Offset="1"/>
-                                        </LinearGradientBrush>
-                                    </Setter.Value>
-                                </Setter>
-                                <Setter Property="BorderBrush" Value="#FF98DDFB"/>
-                            </MultiTrigger>-->
                             <Trigger Property="IsEnabled" Value="False">
                                 <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}"/>
                             </Trigger>
@@ -102,13 +59,7 @@
         </Style>
     </Window.Resources>
     <StackPanel>
-        <!--
-        TODO: refactor this portion later   
-        local:TextBoxExtensions.NonIntrusiveText="{Binding Text, 
-                                        UpdateSourceTrigger=PropertyChanged, 
-                                        Mode=TwoWay}"
-        -->
-        <TextBox  Text="{Binding Text, Mode=OneWay}" IsReadOnly="True" IsReadOnlyCaretVisible="True"
+    <TextBox  Text="{Binding Text, Mode=OneWay}" IsReadOnly="True" IsReadOnlyCaretVisible="True"
                   MaxLength="30" Name="textBoxElement" Background="#1D1D1D" TextElement.Foreground="White" 
                   Height="30"  
                   Visibility="{Binding TextBoxVisibility}" 

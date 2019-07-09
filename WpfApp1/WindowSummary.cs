@@ -60,7 +60,7 @@ namespace WpfApp1
                 int currentProcessId = Process.GetCurrentProcess().Id;
                 if (currentProcessId == process.Id)
                 {
-                    // Application.Current.Windows;
+                    // Application.Current.Windows;l
                     System.Diagnostics.Debug.WriteLine("Skipping Process!!");
                     continue;
                 }
