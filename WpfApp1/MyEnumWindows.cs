@@ -6,9 +6,16 @@ namespace WpfApp1
 {
     public class ChildWindowSummary
     {
-        string title;
-        uint lpdwProcessId;
-        IntPtr windowHandle; 
+        public string title;
+        public uint lpdwProcessId;
+        public IntPtr windowHandle; 
+
+        public ChildWindowSummary(string title, uint lpdwProcessId, IntPtr windowHandle)
+        {
+            this.title = title;
+            this.lpdwProcessId = lpdwProcessId;
+            this.windowHandle = windowHandle;
+        }
     }
 
     class MyEnumWindows
@@ -31,6 +38,7 @@ namespace WpfApp1
         static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);
 
         public static List<string> windowTitles = new List<string>();
+        public static List<ChildWindowSummary> childWindowSummaries = new List<ChildWindowSummary>();
 
 
         public static List<string> GetWindowTitles(bool includeChildren)
@@ -45,6 +53,8 @@ namespace WpfApp1
             string title = MyEnumWindows.GetWindowTitle(testWindowHandle);
             uint lpdwProcessId = 0;
             GetWindowThreadProcessId(testWindowHandle, out lpdwProcessId);
+            ChildWindowSummary childWindowSummary = new ChildWindowSummary(title, lpdwProcessId, testWindowHandle);
+            childWindowSummaries.Add(childWindowSummary);
 
             // Console.WriteLine("Title: {0}, Process Id; {1}", title, lpdwProcessId);
 

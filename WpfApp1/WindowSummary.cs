@@ -26,30 +26,30 @@ namespace WpfApp1
     public class ProgramSummary
     {
         public Process mainWindowProcess;
-        public List<OtherProgramSummary> childProgramSummaries;
+        public List<ChildWindowSummary> childProgramSummaries;
 
         public ProgramSummary(Process process)
         {
             mainWindowProcess = process;
-            childProgramSummaries = new List<OtherProgramSummary>();
+            childProgramSummaries = new List<ChildWindowSummary>();
         }
 
-        public void AddProgramSummary(OtherProgramSummary otherProgramSummary)
+        public void AddChildWindowSummary(ChildWindowSummary childWindowSummary)
         {
-            childProgramSummaries.Add(otherProgramSummary);
+            childProgramSummaries.Add(childWindowSummary);
         }
     }
 
-    public class OtherProgramSummary
-    {
-        public string title;
-        public int windowHandle;
-    }
+    // public class OtherProgramSummary
+    // {
+    //     public string title;
+    //     public int windowHandle;
+    // }
 
     public class WindowSummaryManager
     {
         // List<List<Process>> programProcessList; 
-        public static Dictionary<int, ProgramSummary> programSummaryDict = new Dictionary<int, ProgramSummary>();
+        public static Dictionary<uint, ProgramSummary> programSummaryDict = new Dictionary<uint, ProgramSummary>();
 
         public static List<Process> GetRunningPrograms()
         {
@@ -64,7 +64,7 @@ namespace WpfApp1
                     mainProcessList.Add(process);
                     
                     ProgramSummary currProgramSummary = new ProgramSummary(process);
-                    int processId = process.Id;
+                    uint processId = (uint)process.Id;
                     programSummaryDict.Add(processId, currProgramSummary);
 
                     // programSummaryDict[processId].AddProgramSummary(sample);
@@ -86,43 +86,55 @@ namespace WpfApp1
                 }
             }
 
+            // NOTE: Done Adding Processes 
+
             MyEnumWindows.GetWindowTitles(true);
             Console.WriteLine("MyEnumWindows Result");
-            foreach (var item in MyEnumWindows.windowTitles)
+            foreach (ChildWindowSummary childWindowSummary in MyEnumWindows.childWindowSummaries)
             {
-                Console.WriteLine("item: {0}", item);
+                ProgramSummary currSummary = null;
+                if (programSummaryDict.TryGetValue(childWindowSummary.lpdwProcessId, out currSummary))
+                {
+                    currSummary.AddChildWindowSummary(childWindowSummary);
+                }
+            }
+
+            Console.WriteLine("Done Adding Program Summaries");
+            foreach(KeyValuePair<uint, ProgramSummary> entry in programSummaryDict)
+            {
+                Console.WriteLine("Current childProgramSummaries Length: {0}", entry.Value.childProgramSummaries.Count);
             }
 
             return mainProcessList;
         }
 
-        //public static ObservableCollection<WindowSummary> getWindowSummaryInfo(List<Process> processList)
-        //{
-        //    ObservableCollection<WindowSummary> windowSummaries = new ObservableCollection<WindowSummary>();
-        //    foreach (Process process in processList)
-        //    {
-        //        int currentProcessId = Process.GetCurrentProcess().Id;
-        //        if (currentProcessId == process.Id)
-        //        {
-        //            // Application.Current.Windows;l
-        //            System.Diagnostics.Debug.WriteLine("Skipping Process!!");
-        //            continue;
-        //        }
+        public static ObservableCollection<WindowSummary> getWindowSummaryInfo(List<Process> processList)
+        {
+            ObservableCollection<WindowSummary> windowSummaries = new ObservableCollection<WindowSummary>();
+            foreach (Process process in processList)
+            {
+                int currentProcessId = Process.GetCurrentProcess().Id;
+                if (currentProcessId == process.Id)
+                {
+                    // Application.Current.Windows;l
+                    System.Diagnostics.Debug.WriteLine("Skipping Process!!");
+                    continue;
+                }
 
-        //        if (!String.IsNullOrEmpty(process.MainWindowTitle))
-        //        {
-        //            AutomationElement element = AutomationElement.FromHandle(process.MainWindowHandle);
-        //            Icon associatedProgramIcon = System.Drawing.Icon.ExtractAssociatedIcon(process.MainModule.FileName);
-        //            WindowSummary currWindowSummary = new WindowSummary();
-        //            currWindowSummary.ProgramIcon = ToImageSource(associatedProgramIcon);
-        //            currWindowSummary.ProgramName = process.ProcessName;
-        //            currWindowSummary.ProgramWindowTitle = process.MainWindowTitle;
-        //            windowSummaries.Add(currWindowSummary);
-        //        }
-        //    }
+                if (!String.IsNullOrEmpty(process.MainWindowTitle))
+                {
+                    AutomationElement element = AutomationElement.FromHandle(process.MainWindowHandle);
+                    Icon associatedProgramIcon = System.Drawing.Icon.ExtractAssociatedIcon(process.MainModule.FileName);
+                    WindowSummary currWindowSummary = new WindowSummary();
+                    currWindowSummary.ProgramIcon = ToImageSource(associatedProgramIcon);
+                    currWindowSummary.ProgramName = process.ProcessName;
+                    currWindowSummary.ProgramWindowTitle = process.MainWindowTitle;
+                    windowSummaries.Add(currWindowSummary);
+                }
+            }
 
-        //    return windowSummaries;
-        //}
+            return windowSummaries;
+        }
 
         private static ImageSource ToImageSource(Icon icon)
         {
