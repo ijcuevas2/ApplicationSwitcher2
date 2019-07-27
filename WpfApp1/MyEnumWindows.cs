@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 using System.Collections.Generic;
+using System.Windows;
+using System.Windows.Shapes;
 
 namespace WpfApp1
 {
@@ -30,6 +32,10 @@ namespace WpfApp1
 
         [DllImport("user32.dll")]
         private static extern bool EnumChildWindows(IntPtr hWndStart, EnumWindowsProc callback, IntPtr lParam);
+
+        [return: MarshalAs(UnmanagedType.Bool)]
+        [DllImport("user32.dll", SetLastError = true)]
+        public static extern bool GetWindowInfo(IntPtr hWnd, ref WINDOWINFO pwi);
 
         [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
         public static extern IntPtr SendMessageTimeout(IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam, uint fuFlags, uint uTimeout, out IntPtr lpdwResult);

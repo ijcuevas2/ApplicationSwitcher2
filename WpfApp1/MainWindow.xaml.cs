@@ -18,11 +18,13 @@ namespace WpfApp1
     {
 
         public event PropertyChangedEventHandler PropertyChanged;
-        sealed class CallerMemberNameAttribute: Attribute { }
+        sealed class CallerMemberNameAttribute : Attribute { }
         ObservableCollection<WindowSummary> windowSummaries = null;
         ObservableCollection<WindowSummary> filteredWindowSummaries = null;
         public Boolean isKeyboardShortcut = false;
         public int prevCaretIndex = 0;
+
+
 
         private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
         {

@@ -68,6 +68,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="MyEnumWindows.cs" />
+    <Compile Include="RectHelper.cs" />
     <Compile Include="TextBoxExtensions.cs" />
     <Compile Include="WindowHelper.cs" />
     <Compile Include="WindowManager.cs" />
