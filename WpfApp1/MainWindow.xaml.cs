@@ -209,9 +209,7 @@ namespace WpfApp1
                 this.filteredWindowSummaries.Add(this.windowSummaries[i]);
             }
 
-
             programList.ItemsSource = filteredWindowSummaries;
-            // programList.MouseEnter += new MouseEventHandler(Mouse_Enter);
             Window window = Application.Current.MainWindow;
             DataContext = this;
             window.WindowStartupLocation = WindowStartupLocation.CenterScreen;

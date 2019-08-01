@@ -19,6 +19,7 @@ namespace WpfApp1
     public class WindowSummary
     {
         // TODO: include window desktop number
+        // Ultimately, a program has to be in a window summary
         public ImageSource ProgramIcon { get; set; }
         public string ProgramName { get; set; }
         public string ProgramWindowTitle { get; set; }
@@ -27,11 +28,13 @@ namespace WpfApp1
     public class ProgramSummary
     {
         public Process mainWindowProcess;
+        Icon programIcon;
         public List<ChildWindowSummary> childProgramSummaries;
 
-        public ProgramSummary(Process process)
+        public ProgramSummary(Process process, Icon icon)
         {
             mainWindowProcess = process;
+            programIcon = icon;
             childProgramSummaries = new List<ChildWindowSummary>();
         }
 
@@ -78,124 +81,79 @@ namespace WpfApp1
                 if (!String.IsNullOrEmpty(process.MainWindowTitle))
                 {
                     mainProcessList.Add(process);
-                    
-                    ProgramSummary currProgramSummary = new ProgramSummary(process);
-                    uint processId = (uint)process.Id;
-                    programSummaryDict.Add(processId, currProgramSummary);
-
-                    // programSummaryDict[processId].AddProgramSummary(sample);
-                    // programSummaryDict[processId];
-                    
-                    Process[] currentProcessArr = Process.GetProcessesByName(process.ProcessName);
-
-                    // NOTE: debug code
-                    // foreach (Process subProcess in currentProcessArr)
-                    // {
-                    //     Console.WriteLine("CurrentProcessName: {0}, processId: {1}, mainWindowHandle: {2}", subProcess.ProcessName, subProcess.Id, subProcess.MainWindowHandle);
-                    //     // process
-                    // }
-
-                    // public int 
-                    // List<Process> currentProcessList = new List<Process>();
-                    // programProcessList.Add(currentProcessList);
-                    // MyEnumWindows.EnumWindowsCallback(process.MainWindowHandle, (IntPtr)1);
                 }
             }
 
             // NOTE: Done Adding Processes 
 
-            MyEnumWindows.GetWindowTitles(true);
-            Console.WriteLine("MyEnumWindows Result");
-            foreach (ChildWindowSummary childWindowSummary in MyEnumWindows.childWindowSummaries)
-            {
-                ProgramSummary currSummary = null;
-                if (programSummaryDict.TryGetValue(childWindowSummary.lpdwProcessId, out currSummary))
-                {
-                    currSummary.AddChildWindowSummary(childWindowSummary);
-                }
-            }
-
+            // NOTE: this is somewhat based off of an incorrect assumption
             Console.WriteLine("Done Adding Program Summaries");
-            foreach(KeyValuePair<uint, ProgramSummary> entry in programSummaryDict)
-            {
-                Console.WriteLine("Current childProgramSummaries Length: {0}", entry.Value.childProgramSummaries.Count);
-                foreach (ChildWindowSummary summary in entry.Value.childProgramSummaries)
-                {
-                    Console.WriteLine("Summary Title: {0}", summary.title);
-                    Console.WriteLine("Summary Process: {0}", summary.lpdwProcessId);
-
-                    WINDOWINFO info = new WINDOWINFO();
-                    info.cbSize = (UInt32)Marshal.SizeOf(info);
-                    MyEnumWindows.GetWindowInfo(summary.windowHandle, ref info);
-                    processWindowInfo(info);
-                }
-            }
-
 
             return mainProcessList;
         }
 
-        private static void processWindowInfo(WINDOWINFO info)
+        public static void getRunningChildPrograms(Icon icon)
+        {
+            Process[] processList = Process.GetProcesses();
+            List<Process> mainProcessList = new List<Process>();
+            foreach (Process process in processList)
+            {
+                if (!String.IsNullOrEmpty(process.MainWindowTitle))
+                {
+                    ProgramSummary currProgramSummary = new ProgramSummary(process, icon);
+                    uint processId = (uint)process.Id;
+                    programSummaryDict.Add(processId, currProgramSummary);
+                    MyEnumWindows.GetWindowTitles(true);
+                    Console.WriteLine("MyEnumWindows Result");
+                    foreach (ChildWindowSummary childWindowSummary in MyEnumWindows.childWindowSummaries)
+                    {
+                        ProgramSummary currSummary = null;
+                        if (programSummaryDict.TryGetValue(childWindowSummary.lpdwProcessId, out currSummary))
+                        {
+                            currSummary.AddChildWindowSummary(childWindowSummary);
+                        }
+                    }
+                }
+
+                foreach(KeyValuePair<uint, ProgramSummary> entry in programSummaryDict)
+                {
+                    Console.WriteLine("Current childProgramSummaries Length: {0}", entry.Value.childProgramSummaries.Count);
+                    foreach (ChildWindowSummary summary in entry.Value.childProgramSummaries)
+                    {
+                        Console.WriteLine("Summary Title: {0}", summary.title);
+                        Console.WriteLine("Summary Process: {0}", summary.lpdwProcessId);
+
+                        WINDOWINFO info = new WINDOWINFO();
+                        info.cbSize = (UInt32)Marshal.SizeOf(info);
+                        MyEnumWindows.GetWindowInfo(summary.windowHandle, ref info);
+                        Boolean match = processWindowInfo(info);
+                        if (match)
+                        {
+                            WindowSummary childProgram = new WindowSummary();
+                        }
+                    }
+                }
+            }
+        }
+
+        private static Boolean processWindowInfo(WINDOWINFO info)
         {
             Dictionary<string, long> windowStyles = new Dictionary<string, long>();
 
-            //windowStyles.Add("WS_BORDER", 0x00800000L);
-            //windowStyles.Add("WS_CAPTION", 0x00C00000L);
-            //windowStyles.Add("WS_CHILD", 0x40000000L);
-            // windowStyles.Add("WS_CHILDWINDOW", 0x40000000L);
-            //windowStyles.Add("WS_CLIPCHILDREN", 0x02000000L);
-            //windowStyles.Add("WS_CLIPSIBLINGS", 0x04000000L);
-            //windowStyles.Add("WS_DISABLED", 0x08000000L);
-            //windowStyles.Add("WS_DLGFRAME", 0x00400000L);
-            //windowStyles.Add("WS_GROUP", 0x00020000L);
-            //windowStyles.Add("WS_HSCROLL", 0x00100000L);
-            //windowStyles.Add("WS_ICONIC", 0x20000000L);
             windowStyles.Add("WS_MAXIMIZE", 0x01000000L);
-            //windowStyles.Add("WS_MAXIMIZEBOX", 0x00010000L);
             windowStyles.Add("WS_MINIMIZE", 0x20000000L);
-            //windowStyles.Add("WS_MINIMIZEBOX", 0x00020000L);
-            //windowStyles.Add("WS_OVERLAPPED", 0x00000000L);
-            //windowStyles.Add("WS_POPUP", 0x80000000L);
-            //windowStyles.Add("WS_SIZEBOX", 0x00040000L);
-            //windowStyles.Add("WS_SYSMENU", 0x00080000L);
-            //windowStyles.Add("WS_TABSTOP", 0x00010000L);
-            //windowStyles.Add("WS_THICKFRAME", 0x00040000L);
-            //windowStyles.Add("WS_TILED", 0x00000000L);
-            //windowStyles.Add("WS_VISIBLE", 0x10000000L);
-            //windowStyles.Add("WS_VSCROLL", 0x00200000L);
 
             // NOTE: Not necessary I guess?
             Dictionary<string, long> extendedWindowStyles = new Dictionary<string, long>();
-            //extendedWindowStyles.Add("WS_EX_ACCEPTFILES", 0x00000010L);
-            //extendedWindowStyles.Add("WS_EX_APPWINDOW", 0x00040000L);
-            //extendedWindowStyles.Add("WS_EX_CLIENTEDGE", 0x00000010L);
-            //extendedWindowStyles.Add("WS_EX_COMPOSITED", 0x02000000L);
-            //extendedWindowStyles.Add("WS_EX_CONTEXTHELP", 0x00000400L);
-            //extendedWindowStyles.Add("WS_EX_CONTROLPARENT", 0x00010000L);
-            //extendedWindowStyles.Add("WS_EX_DLGMODALFRAME", 0x00000001L);
-            //extendedWindowStyles.Add("WS_EX_LAYERED", 0x00080000);
-            //extendedWindowStyles.Add("WS_EX_LAYOUTRTL", 0x00400000L);
-            //extendedWindowStyles.Add("WS_EX_LEFTSCROLLBAR", 0x00004000L);
-            //extendedWindowStyles.Add("WS_EX_LTRREADING", 0x00000000L);
-            //extendedWindowStyles.Add("WS_EX_MDICHILD", 0x00000040L);
-            //extendedWindowStyles.Add("WS_EX_NOACTIVATE", 0x08000000L);
-            //extendedWindowStyles.Add("WS_EX_NOREDIRECTIONBITMAP", 0x00200000L);
-            //extendedWindowStyles.Add("WS_EX_OVERLAPPEDWINDOW"); 
-            //extendedWindowStyles.Add("WS_EX_PALETTEWINDOW"); 
-            //extendedWindowStyles.Add("WS_EX_RIGHT", 0x00001000L);
-            //extendedWindowStyles.Add("WS_EX_RIGHTSCROLLBAR", 0x00001000L);
-            //extendedWindowStyles.Add("WS_EX_RTLREADING", 0x00002000L);
-            //extendedWindowStyles.Add("WS_EX_STATICEDGE", 0x00020000L);
-            //extendedWindowStyles.Add("WS_EX_TOOLWINDOW", 0x00000080L);
             extendedWindowStyles.Add("WS_EX_TOPMOST", 0x00000008L);
-            //extendedWindowStyles.Add("WS_EX_TRANSPARENT", 0x00000020L);
-            //extendedWindowStyles.Add("WS_EX_WINDOWEDGE", 0x00000100L);
 
-            iterateThroughDict(windowStyles, info, false);
-            iterateThroughDict(extendedWindowStyles, info, true);
+            Boolean styleMatch = iterateThroughDict(windowStyles, info, false);
+            Boolean exStyleMatch = iterateThroughDict(extendedWindowStyles, info, true);
+            Boolean viableChildWindow = styleMatch && exStyleMatch;
+            return viableChildWindow;
         }
 
-        public static void iterateThroughDict(Dictionary<string, long> dict, WINDOWINFO info, Boolean extended)
+        public static Boolean iterateThroughDict(Dictionary<string, long> dict, WINDOWINFO info, Boolean extended)
         {
             Console.WriteLine("iterateThroughDict Size: {0}", dict.Count);
             foreach(KeyValuePair<string, long> entry in dict)
@@ -215,7 +173,7 @@ namespace WpfApp1
 
                 else
                 {
-                    // Console.WriteLine("Hex Extended: {0:X}", info.dwExStyle);
+                    // Console.WriteLine("Hex Extended: {1:X}", info.dwExStyle);
                     match = (info.dwExStyle & value) != 0;
                     //if ((info.dwExStyle & dict["WS_EX_TOPMOST"]) == 0)
                     //{
@@ -229,11 +187,13 @@ namespace WpfApp1
                 {
                     if (entry.Key == "WS_EX_TOPMOST" || entry.Key == "WS_MINIMIZE")
                     {
-                        Console.WriteLine("Current Style: {0}", entry.Key);
-                        Console.WriteLine("Current Value: {0}", entry.Value);
+                        return true;
                     }
                 }
+
             }
+
+            return false;
         }
 
         public static ObservableCollection<WindowSummary> getWindowSummaryInfo(List<Process> processList)
@@ -253,6 +213,11 @@ namespace WpfApp1
                 {
                     AutomationElement element = AutomationElement.FromHandle(process.MainWindowHandle);
                     Icon associatedProgramIcon = System.Drawing.Icon.ExtractAssociatedIcon(process.MainModule.FileName);
+                    // Call get the running child programs here? or just iterate 
+                    // afterward.
+                    // NOTE: Test 
+                    
+
                     WindowSummary currWindowSummary = new WindowSummary();
                     currWindowSummary.ProgramIcon = ToImageSource(associatedProgramIcon);
                     currWindowSummary.ProgramName = process.ProcessName;

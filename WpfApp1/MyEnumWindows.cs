@@ -62,7 +62,7 @@ namespace WpfApp1
             ChildWindowSummary childWindowSummary = new ChildWindowSummary(title, lpdwProcessId, testWindowHandle);
             childWindowSummaries.Add(childWindowSummary);
 
-            // Console.WriteLine("Title: {0}, Process Id; {1}", title, lpdwProcessId);
+            Console.WriteLine("Title: {0}, Process Id; {1}", title, lpdwProcessId);
 
             MyEnumWindows.windowTitles.Add(title);
 
