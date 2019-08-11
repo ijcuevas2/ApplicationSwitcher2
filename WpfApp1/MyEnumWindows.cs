@@ -59,10 +59,14 @@ namespace WpfApp1
             string title = MyEnumWindows.GetWindowTitle(testWindowHandle);
             uint lpdwProcessId = 0;
             GetWindowThreadProcessId(testWindowHandle, out lpdwProcessId);
-            ChildWindowSummary childWindowSummary = new ChildWindowSummary(title, lpdwProcessId, testWindowHandle);
-            childWindowSummaries.Add(childWindowSummary);
+            //if (hasChildProgramWindow(testWindowHandle) && title != "")
+            if (hasChildProgramWindow(testWindowHandle))
+            {
+                ChildWindowSummary childWindowSummary = new ChildWindowSummary(title, lpdwProcessId, testWindowHandle);
+                childWindowSummaries.Add(childWindowSummary);
+                Console.WriteLine("Title: {0}, Process Id; {1}", title, lpdwProcessId);
+            }
 
-            Console.WriteLine("Title: {0}, Process Id; {1}", title, lpdwProcessId);
 
             MyEnumWindows.windowTitles.Add(title);
 
@@ -72,6 +76,74 @@ namespace WpfApp1
             }
 
             return true;
+        }
+
+        public static bool hasChildProgramWindow(IntPtr windowHandle)
+        {
+            WINDOWINFO info = new WINDOWINFO();
+            info.cbSize = (UInt32)Marshal.SizeOf(info);
+            MyEnumWindows.GetWindowInfo(windowHandle, ref info);
+            Boolean match = processWindowInfo(info);
+            return match;
+        }
+
+        private static Boolean processWindowInfo(WINDOWINFO info)
+        {
+            Dictionary<string, long> windowStyles = new Dictionary<string, long>();
+
+            //windowStyles.Add("WS_MAXIMIZE", 0x01000000L);
+            windowStyles.Add("WS_MINIMIZE", 0x20000000L);
+
+            // NOTE: Not necessary I guess?
+            Dictionary<string, long> extendedWindowStyles = new Dictionary<string, long>();
+            extendedWindowStyles.Add("WS_EX_TOPMOST", 0x00000008L);
+
+            Boolean styleMatch = iterateThroughDict(windowStyles, info, false);
+            Boolean exStyleMatch = iterateThroughDict(extendedWindowStyles, info, true);
+            Boolean viableChildWindow = styleMatch && exStyleMatch;
+            return viableChildWindow;
+        }
+
+        public static Boolean iterateThroughDict(Dictionary<string, long> dict, WINDOWINFO info, Boolean extended)
+        {
+            Console.WriteLine("iterateThroughDict Size: {0}", dict.Count);
+            foreach(KeyValuePair<string, long> entry in dict)
+            {
+                long value = entry.Value;
+
+                Boolean match = false;
+                if (!extended)
+                {
+                    match = (info.dwStyle & value) != 0;
+                    // Console.WriteLine("Hex: {0:X}", info.dwStyle);
+                    //if ((info.dwStyle & dict["WS_MINIMIZE"]) == 0)
+                    //{
+                    //    continue;
+                    //}
+                }
+
+                else
+                {
+                    // Console.WriteLine("Hex Extended: {1:X}", info.dwExStyle);
+                    match = (info.dwExStyle & value) != 0;
+                    //if ((info.dwExStyle & dict["WS_EX_TOPMOST"]) == 0)
+                    //{
+                    //    continue;
+                    //}
+                }
+
+                // Console.WriteLine("Match: {0}", match);
+
+                if (match)
+                {
+                    if (entry.Key == "WS_EX_TOPMOST" || entry.Key == "WS_MINIMIZE")
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
         }
 
         private static bool TitleMatches(string title, string key)

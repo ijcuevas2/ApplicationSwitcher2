@@ -24,6 +24,39 @@ namespace WpfApp1
         public Boolean isKeyboardShortcut = false;
         public int prevCaretIndex = 0;
 
+        public MainWindow()
+        {
+            InitializeComponent();
+
+            // TODO: figure out what this does
+            Style = (Style)FindResource(typeof(Window));
+            Keyevent();
+            this.KeyDown += new KeyEventHandler(MainWindow_KeyDown);
+            // Console.WriteLine("App.Current.Windows:", App.Current.Windows);
+            // Console.WriteLine("Hello");
+            // NOTE: This is a test to get all the running programs
+            // MyEnumWindows.GetWindowTitles(true);
+
+            Process[] processList = Process.GetProcesses();
+            // TODO: Refactor this
+            List<Process> mainProcessList = WindowSummaryManager.GetRunningPrograms();
+            this.windowSummaries = WindowSummaryManager.getWindowSummaryInfo(mainProcessList);
+
+            this.filteredWindowSummaries = new ObservableCollection<WindowSummary>();
+
+            for (int i = 0; i < windowSummaries.Count; i++)
+            {
+                this.filteredWindowSummaries.Add(this.windowSummaries[i]);
+            }
+
+            programList.ItemsSource = filteredWindowSummaries;
+            Window window = Application.Current.MainWindow;
+            DataContext = this;
+            window.WindowStartupLocation = WindowStartupLocation.CenterScreen;
+            window.WindowStyle = WindowStyle.None;
+            window.ResizeMode = ResizeMode.NoResize;
+            // MainWindow_Hide();
+        }
 
 
         private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
@@ -187,36 +220,6 @@ namespace WpfApp1
             // Console.WriteLine("After CaratIndex: {0}", textBoxElement.CaretIndex);
         }
 
-        public MainWindow()
-        {
-            InitializeComponent();
-
-            // TODO: figure out what this does
-            Style = (Style)FindResource(typeof(Window));
-            Keyevent();
-            this.KeyDown += new KeyEventHandler(MainWindow_KeyDown);
-            // Console.WriteLine("App.Current.Windows:", App.Current.Windows);
-            // Console.WriteLine("Hello");
-            Process[] processList = Process.GetProcesses();
-            // TODO: Refactor this
-            List<Process> mainProcessList = WindowSummaryManager.GetRunningPrograms();
-            this.windowSummaries = WindowSummaryManager.getWindowSummaryInfo(mainProcessList);
-
-            this.filteredWindowSummaries = new ObservableCollection<WindowSummary>();
-
-            for (int i = 0; i < windowSummaries.Count; i++)
-            {
-                this.filteredWindowSummaries.Add(this.windowSummaries[i]);
-            }
-
-            programList.ItemsSource = filteredWindowSummaries;
-            Window window = Application.Current.MainWindow;
-            DataContext = this;
-            window.WindowStartupLocation = WindowStartupLocation.CenterScreen;
-            window.WindowStyle = WindowStyle.None;
-            window.ResizeMode = ResizeMode.NoResize;
-            // MainWindow_Hide();
-        }
 
         // public static void Mouse_Enter(object sender, MouseEventArgs e)
         // {

@@ -84,7 +84,7 @@ namespace WpfApp1
                 }
             }
 
-            // NOTE: Done Adding Processes 
+            // NOTE: Done Adding Processes
 
             // NOTE: this is somewhat based off of an incorrect assumption
             Console.WriteLine("Done Adding Program Summaries");
@@ -92,7 +92,7 @@ namespace WpfApp1
             return mainProcessList;
         }
 
-        public static void getRunningChildPrograms(Icon icon)
+        public static void getRunningChildPrograms()
         {
             Process[] processList = Process.GetProcesses();
             List<Process> mainProcessList = new List<Process>();
@@ -100,11 +100,11 @@ namespace WpfApp1
             {
                 if (!String.IsNullOrEmpty(process.MainWindowTitle))
                 {
-                    ProgramSummary currProgramSummary = new ProgramSummary(process, icon);
-                    uint processId = (uint)process.Id;
-                    programSummaryDict.Add(processId, currProgramSummary);
-                    MyEnumWindows.GetWindowTitles(true);
-                    Console.WriteLine("MyEnumWindows Result");
+                    //ProgramSummary currProgramSummary = new ProgramSummary(process, icon);
+                    //uint processId = (uint)process.Id;
+                    //programSummaryDict.Add(processId, currProgramSummary);
+                    //MyEnumWindows.GetWindowTitles(true);
+                    //Console.WriteLine("MyEnumWindows Result");
                     foreach (ChildWindowSummary childWindowSummary in MyEnumWindows.childWindowSummaries)
                     {
                         ProgramSummary currSummary = null;
@@ -190,41 +190,94 @@ namespace WpfApp1
                         return true;
                     }
                 }
-
             }
 
             return false;
         }
 
+        //public static ObservableCollection<WindowSummary> getWindowSummaryInfo(List<Process> processList)
+        //{
+        //    ObservableCollection<WindowSummary> windowSummaries = new ObservableCollection<WindowSummary>();
+        //    foreach (Process process in processList)
+        //    {
+        //        int currentProcessId = Process.GetCurrentProcess().Id;
+        //        if (currentProcessId == process.Id)
+        //        {
+        //            // Application.Current.Windows;l
+        //            System.Diagnostics.Debug.WriteLine("Skipping Process!!");
+        //            continue;
+        //        }
+
+        //        Console.WriteLine("process.ProcessName: {0}", process.ProcessName);
+        //        Console.WriteLine("process.Id: {0}", process.Id);
+
+        //        if (!String.IsNullOrEmpty(process.MainWindowTitle))
+        //        {
+        //            AutomationElement element = AutomationElement.FromHandle(process.MainWindowHandle);
+        //            Icon associatedProgramIcon = System.Drawing.Icon.ExtractAssociatedIcon(process.MainModule.FileName);
+        //            // Call get the running child programs here? or just iterate 
+        //            // afterward.
+        //            // NOTE: Test 
+                    
+
+        //            WindowSummary currWindowSummary = new WindowSummary();
+        //            currWindowSummary.ProgramIcon = ToImageSource(associatedProgramIcon);
+        //            currWindowSummary.ProgramName = process.ProcessName;
+        //            currWindowSummary.ProgramWindowTitle = process.MainWindowTitle;
+        //            windowSummaries.Add(currWindowSummary);
+        //        }
+        //    }
+
+        //    return windowSummaries;
+        //}
+
         public static ObservableCollection<WindowSummary> getWindowSummaryInfo(List<Process> processList)
         {
             ObservableCollection<WindowSummary> windowSummaries = new ObservableCollection<WindowSummary>();
-            foreach (Process process in processList)
+            MyEnumWindows.GetWindowTitles(true);
+            foreach (ChildWindowSummary summary in MyEnumWindows.childWindowSummaries)
             {
-                int currentProcessId = Process.GetCurrentProcess().Id;
-                if (currentProcessId == process.Id)
-                {
-                    // Application.Current.Windows;l
-                    System.Diagnostics.Debug.WriteLine("Skipping Process!!");
-                    continue;
-                }
+                // Call get the running child programs here? or just iterate 
+                Process process = Process.GetProcessById((int)summary.lpdwProcessId);
+                AutomationElement element = AutomationElement.FromHandle(summary.windowHandle);
+                Icon associatedProgramIcon = System.Drawing.Icon.ExtractAssociatedIcon(process.MainModule.FileName);
 
-                if (!String.IsNullOrEmpty(process.MainWindowTitle))
-                {
-                    AutomationElement element = AutomationElement.FromHandle(process.MainWindowHandle);
-                    Icon associatedProgramIcon = System.Drawing.Icon.ExtractAssociatedIcon(process.MainModule.FileName);
-                    // Call get the running child programs here? or just iterate 
-                    // afterward.
-                    // NOTE: Test 
+                WindowSummary currWindowSummary = new WindowSummary();
+                currWindowSummary.ProgramIcon = ToImageSource(associatedProgramIcon);
+                currWindowSummary.ProgramName = process.ProcessName;
+                currWindowSummary.ProgramWindowTitle = summary.title;
+                windowSummaries.Add(currWindowSummary);
+            }
+
+            //foreach (Process process in processList)
+            //{
+            //    int currentProcessId = Process.GetCurrentProcess().Id;
+            //    if (currentProcessId == process.Id)
+            //    {
+            //        // Application.Current.Windows;l
+            //        System.Diagnostics.Debug.WriteLine("Skipping Process!!");
+            //        continue;
+            //    }
+
+            //    Console.WriteLine("process.ProcessName: {0}", process.ProcessName);
+            //    Console.WriteLine("process.Id: {0}", process.Id);
+
+            //    if (!String.IsNullOrEmpty(process.MainWindowTitle))
+            //    {
+            //        AutomationElement element = AutomationElement.FromHandle(process.MainWindowHandle);
+            //        Icon associatedProgramIcon = System.Drawing.Icon.ExtractAssociatedIcon(process.MainModule.FileName);
+            //        // Call get the running child programs here? or just iterate 
+            //        // afterward.
+            //        // NOTE: Test 
                     
 
-                    WindowSummary currWindowSummary = new WindowSummary();
-                    currWindowSummary.ProgramIcon = ToImageSource(associatedProgramIcon);
-                    currWindowSummary.ProgramName = process.ProcessName;
-                    currWindowSummary.ProgramWindowTitle = process.MainWindowTitle;
-                    windowSummaries.Add(currWindowSummary);
-                }
-            }
+            //        WindowSummary currWindowSummary = new WindowSummary();
+            //        currWindowSummary.ProgramIcon = ToImageSource(associatedProgramIcon);
+            //        currWindowSummary.ProgramName = process.ProcessName;
+            //        currWindowSummary.ProgramWindowTitle = process.MainWindowTitle;
+            //        windowSummaries.Add(currWindowSummary);
+            //    }
+            //}
 
             return windowSummaries;
         }
