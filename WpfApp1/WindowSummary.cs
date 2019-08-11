@@ -195,42 +195,6 @@ namespace WpfApp1
             return false;
         }
 
-        //public static ObservableCollection<WindowSummary> getWindowSummaryInfo(List<Process> processList)
-        //{
-        //    ObservableCollection<WindowSummary> windowSummaries = new ObservableCollection<WindowSummary>();
-        //    foreach (Process process in processList)
-        //    {
-        //        int currentProcessId = Process.GetCurrentProcess().Id;
-        //        if (currentProcessId == process.Id)
-        //        {
-        //            // Application.Current.Windows;l
-        //            System.Diagnostics.Debug.WriteLine("Skipping Process!!");
-        //            continue;
-        //        }
-
-        //        Console.WriteLine("process.ProcessName: {0}", process.ProcessName);
-        //        Console.WriteLine("process.Id: {0}", process.Id);
-
-        //        if (!String.IsNullOrEmpty(process.MainWindowTitle))
-        //        {
-        //            AutomationElement element = AutomationElement.FromHandle(process.MainWindowHandle);
-        //            Icon associatedProgramIcon = System.Drawing.Icon.ExtractAssociatedIcon(process.MainModule.FileName);
-        //            // Call get the running child programs here? or just iterate 
-        //            // afterward.
-        //            // NOTE: Test 
-                    
-
-        //            WindowSummary currWindowSummary = new WindowSummary();
-        //            currWindowSummary.ProgramIcon = ToImageSource(associatedProgramIcon);
-        //            currWindowSummary.ProgramName = process.ProcessName;
-        //            currWindowSummary.ProgramWindowTitle = process.MainWindowTitle;
-        //            windowSummaries.Add(currWindowSummary);
-        //        }
-        //    }
-
-        //    return windowSummaries;
-        //}
-
         public static ObservableCollection<WindowSummary> getWindowSummaryInfo(List<Process> processList)
         {
             ObservableCollection<WindowSummary> windowSummaries = new ObservableCollection<WindowSummary>();
@@ -248,36 +212,6 @@ namespace WpfApp1
                 currWindowSummary.ProgramWindowTitle = summary.title;
                 windowSummaries.Add(currWindowSummary);
             }
-
-            //foreach (Process process in processList)
-            //{
-            //    int currentProcessId = Process.GetCurrentProcess().Id;
-            //    if (currentProcessId == process.Id)
-            //    {
-            //        // Application.Current.Windows;l
-            //        System.Diagnostics.Debug.WriteLine("Skipping Process!!");
-            //        continue;
-            //    }
-
-            //    Console.WriteLine("process.ProcessName: {0}", process.ProcessName);
-            //    Console.WriteLine("process.Id: {0}", process.Id);
-
-            //    if (!String.IsNullOrEmpty(process.MainWindowTitle))
-            //    {
-            //        AutomationElement element = AutomationElement.FromHandle(process.MainWindowHandle);
-            //        Icon associatedProgramIcon = System.Drawing.Icon.ExtractAssociatedIcon(process.MainModule.FileName);
-            //        // Call get the running child programs here? or just iterate 
-            //        // afterward.
-            //        // NOTE: Test 
-                    
-
-            //        WindowSummary currWindowSummary = new WindowSummary();
-            //        currWindowSummary.ProgramIcon = ToImageSource(associatedProgramIcon);
-            //        currWindowSummary.ProgramName = process.ProcessName;
-            //        currWindowSummary.ProgramWindowTitle = process.MainWindowTitle;
-            //        windowSummaries.Add(currWindowSummary);
-            //    }
-            //}
 
             return windowSummaries;
         }
