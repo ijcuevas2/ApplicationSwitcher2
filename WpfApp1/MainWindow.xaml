@@ -10,10 +10,10 @@
         SizeToContent="WidthAndHeight">
     <!-- ShowInTaskbar="False"-->
     <Window.Resources>
-        <Style TargetType="ListViewItem">
+        <!--<Style TargetType="ListViewItem">
             <Setter Property="HorizontalContentAlignment" Value="Stretch" />
             <Setter Property="VerticalContentAlignment" Value="Stretch" />
-        </Style>
+        </Style>-->
         <Style TargetType="{x:Type Window}">
             <Setter Property="FontFamily" Value="Segoe UI" />
             <Setter Property="FontSize" Value="18" />

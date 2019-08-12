@@ -59,8 +59,8 @@ namespace WpfApp1
             string title = MyEnumWindows.GetWindowTitle(testWindowHandle);
             uint lpdwProcessId = 0;
             GetWindowThreadProcessId(testWindowHandle, out lpdwProcessId);
-            //if (hasChildProgramWindow(testWindowHandle) && title != "")
-            if (hasChildProgramWindow(testWindowHandle))
+            //if (hasChildProgramWindow(testWindowHandle))
+            if (hasChildProgramWindow(testWindowHandle) && title != "")
             {
                 ChildWindowSummary childWindowSummary = new ChildWindowSummary(title, lpdwProcessId, testWindowHandle);
                 childWindowSummaries.Add(childWindowSummary);

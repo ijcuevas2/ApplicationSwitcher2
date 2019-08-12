@@ -164,7 +164,7 @@ namespace WpfApp1
                 if (!extended)
                 {
                     match = (info.dwStyle & value) != 0;
-                    // Console.WriteLine("Hex: {0:X}", info.dwStyle);
+                    //Console.WriteLine("Hex: {0:X}", info.dwStyle);
                     //if ((info.dwStyle & dict["WS_MINIMIZE"]) == 0)
                     //{
                     //    continue;
@@ -173,18 +173,19 @@ namespace WpfApp1
 
                 else
                 {
-                    // Console.WriteLine("Hex Extended: {1:X}", info.dwExStyle);
                     match = (info.dwExStyle & value) != 0;
+                    //Console.WriteLine("Hex Extended: {0:X}", info.dwExStyle);
                     //if ((info.dwExStyle & dict["WS_EX_TOPMOST"]) == 0)
                     //{
                     //    continue;
                     //}
                 }
 
-                // Console.WriteLine("Match: {0}", match);
+                Console.WriteLine("Match: {0}", match);
 
                 if (match)
                 {
+                    Console.WriteLine("");
                     if (entry.Key == "WS_EX_TOPMOST" || entry.Key == "WS_MINIMIZE")
                     {
                         return true;
