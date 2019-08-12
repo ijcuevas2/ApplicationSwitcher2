@@ -106,7 +106,7 @@ namespace WpfApp1
 
         public static Boolean iterateThroughDict(Dictionary<string, long> dict, WINDOWINFO info, Boolean extended)
         {
-            Console.WriteLine("iterateThroughDict Size: {0}", dict.Count);
+            //Console.WriteLine("iterateThroughDict Size: {0}", dict.Count);
             foreach(KeyValuePair<string, long> entry in dict)
             {
                 long value = entry.Value;

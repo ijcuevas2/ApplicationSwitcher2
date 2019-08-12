@@ -389,6 +389,10 @@ namespace WpfApp1
                     Boolean isCtrlModifier = (Keyboard.Modifiers & ModifierKeys.Control) != 0;
                     Boolean isAltModifier = (Keyboard.Modifiers & ModifierKeys.Alt) != 0;
                     // Console.WriteLine("isAlt: {0}", isAlt);
+                    //if (isAlt)
+                    //{
+                    //    MainWindow_Show();
+                    //}
 
                     if (isCtrlModifier && isKeyEquals(currentKey, Key.A))
                     {
@@ -509,7 +513,7 @@ namespace WpfApp1
                     Boolean isAltTab = lParam.vkCode == 0x09 && lParam.flags == 32;
                     if (isAltTab)
                     {
-                        this.ShowMainWindow();
+                        this.MainWindow_Show();
                         isKeyboardShortcut = true;
                         Console.WriteLine("isShiftKey: {0}", isShiftKey);
                         if (isShiftKey) {
@@ -535,10 +539,11 @@ namespace WpfApp1
                     // Console.WriteLine("isAlt: {0}", isAlt);
                     // Console.WriteLine("lParam.vkCode: {0}", lParam.vkCode);
                     // NOTE: Be Careful
-                    // if (isAlt)
-                    // {
-                    //     MainWindow_Hide();
-                    // }
+                    if (isAlt)
+                    {
+                        MainWindow_Hide();
+                        ProcessItemSwitch();
+                    }
                 }
             }
 
@@ -551,7 +556,7 @@ namespace WpfApp1
             Console.WriteLine("TextChanged!: {0}", textBoxElement.Text);
         }
 
-        public void ShowMainWindow()
+        public void MainWindow_Show()
         {
             this.Show();
         }
@@ -559,6 +564,14 @@ namespace WpfApp1
         public void MainWindow_Hide()
         {
             this.Hide();
+        }
+
+        public void ProcessItemSwitch()
+        {
+            int index = programList.SelectedIndex;
+            WindowSummary currSummary = filteredWindowSummaries[index];
+            Console.WriteLine("Curr Summary Program Name: {0}", currSummary.ProgramName);
+            currSummary.Element.SetFocus();
         }
 
         // TODO: Figure out that this gets called properly

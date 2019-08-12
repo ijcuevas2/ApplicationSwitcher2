@@ -31,6 +31,11 @@ namespace WpfApp1
             _notifyIcon.ContextMenuStrip.Items.Add("Exit").Click += (s, e) => ExitApplication();
         }
 
+        //public void App_Deactivated(object sender, EventArgs e)
+        //{
+        //    MainWindow_Hide();
+        //}
+
         // TODO: Might not be necessary
         // private void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         // {

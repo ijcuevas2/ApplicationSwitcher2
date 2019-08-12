@@ -7,13 +7,9 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="Auto" 
         Width="Auto" 
-        SizeToContent="WidthAndHeight">
-    <!-- ShowInTaskbar="False"-->
+        SizeToContent="WidthAndHeight"
+        ShowInTaskbar="False">
     <Window.Resources>
-        <!--<Style TargetType="ListViewItem">
-            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-            <Setter Property="VerticalContentAlignment" Value="Stretch" />
-        </Style>-->
         <Style TargetType="{x:Type Window}">
             <Setter Property="FontFamily" Value="Segoe UI" />
             <Setter Property="FontSize" Value="18" />
@@ -30,7 +26,8 @@
                                         <RowDefinition/>
                                     </Grid.RowDefinitions>
                                     <Rectangle x:Name="UpperHighlight" Fill="#75FFFFFF" Visibility="Collapsed"/>
-                                    <GridViewRowPresenter Columns="{TemplateBinding GridView.ColumnCollection}" Content="{TemplateBinding Content}" Grid.RowSpan="2" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                                    <GridViewRowPresenter Columns="{TemplateBinding GridView.ColumnCollection}" Content="{TemplateBinding Content}" Grid.RowSpan="2" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" 
+                                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
                                 </Grid>
                             </Border>
                         </Border>
@@ -56,6 +53,8 @@
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
+            <!--<Setter Property="GridView.">
+            </Setter>-->
         </Style>
     </Window.Resources>
     <StackPanel>
@@ -70,7 +69,7 @@
               SelectedIndex="{Binding Path=ProgramIndex}"
               SelectionMode="Single"
               PreviewMouseMove="PreviewMouse_Move"
-              ItemContainerStyle="{DynamicResource ListViewContainerStyle}">
+              ItemContainerStyle="{StaticResource ListViewContainerStyle}">
             <ListView.View>
                 <GridView>
                     <GridView.ColumnHeaderContainerStyle>
@@ -78,10 +77,10 @@
                             <Setter Property="Visibility" Value="Collapsed" />
                         </Style>
                     </GridView.ColumnHeaderContainerStyle>
-                    <GridViewColumn Width="Auto" Header="Title" >
+                    <GridViewColumn Width="Auto" Header="Title">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding ProgramName}" TextAlignment="Right" />
+                                <TextBlock Text="{Binding ProgramName}" TextAlignment="Center"/>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
@@ -95,13 +94,13 @@
                     <GridViewColumn Width="Auto" Header="Window Title">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding ProgramWindowTitle}" TextAlignment="Left" Width="Auto"/>
+                                <!--<TextBlock Text="{Binding ProgramWindowTitle}" TextAlignment="Left" Width="Auto"/>-->
+                                <TextBlock Text="{Binding ProgramWindowTitle}" />
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
                 </GridView>
             </ListView.View>
-            <!-- <ListViewItem Content="ListViewItem" Margin="0" Template="{DynamicResource ListViewItemControlTemplate1}"/> -->
         </ListView>
     </StackPanel>
 </Window>

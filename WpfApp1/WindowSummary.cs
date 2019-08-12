@@ -20,6 +20,7 @@ namespace WpfApp1
     {
         // TODO: include window desktop number
         // Ultimately, a program has to be in a window summary
+        public AutomationElement Element { get; set; }
         public ImageSource ProgramIcon { get; set; }
         public string ProgramName { get; set; }
         public string ProgramWindowTitle { get; set; }
@@ -208,6 +209,7 @@ namespace WpfApp1
                 Icon associatedProgramIcon = System.Drawing.Icon.ExtractAssociatedIcon(process.MainModule.FileName);
 
                 WindowSummary currWindowSummary = new WindowSummary();
+                currWindowSummary.Element = element;
                 currWindowSummary.ProgramIcon = ToImageSource(associatedProgramIcon);
                 currWindowSummary.ProgramName = process.ProcessName;
                 currWindowSummary.ProgramWindowTitle = summary.title;
