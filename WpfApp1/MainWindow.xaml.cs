@@ -4,12 +4,14 @@ using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Controls;
+using System.Linq;
 using System.Collections.ObjectModel;
 using System.Runtime.InteropServices;
 using System.Diagnostics;
+using Screen = System.Windows.Forms.Screen;
 
 
-namespace WpfApp1
+namespace ApplicationSwitcher
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
@@ -200,6 +202,8 @@ namespace WpfApp1
                     filteredWindowSummaries.Add(windowSummaries[i]);
                 }
             }
+
+            //this.ProgramIndex = 0;
         }
 
         public void decrementCursorIndex()
@@ -559,6 +563,9 @@ namespace WpfApp1
         public void MainWindow_Show()
         {
             this.Show();
+            this.Topmost = true;
+            this.Text = "";
+            this.setTextBoxCollapsed();
         }
 
         public void MainWindow_Hide()
@@ -574,10 +581,30 @@ namespace WpfApp1
             currSummary.Element.SetFocus();
         }
 
+        //public void Set Screen
+
         // TODO: Figure out that this gets called properly
         private void Window_Closed(object sender, EventArgs e)
         {
             UnhookWindowsHookEx(hHook);
+        }
+
+        public void SetTargetDisplay()
+        {
+            string targetDeviceName = WpfApp1.Properties.Settings.Default.DisplayDevice;
+            if(!String.IsNullOrEmpty(targetDeviceName))
+            {
+                var screen = (from s in Screen.AllScreens
+                              where s.DeviceName.ToLower().Equals(targetDeviceName.ToLower())
+                              select s).FirstOrDefault();
+                if (screen != null)
+                {
+                    Left = screen.WorkingArea.Left;
+                    Top = screen.WorkingArea.Top;
+                    Width = screen.WorkingArea.Width;
+                    Height = screen.WorkingArea.Height;
+                }
+            }
         }
     }
 }

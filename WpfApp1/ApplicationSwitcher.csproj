@@ -67,6 +67,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="ScreenHandler.cs" />
     <Compile Include="MyEnumWindows.cs" />
     <Compile Include="RectHelper.cs" />
     <Compile Include="TextBoxExtensions.cs" />

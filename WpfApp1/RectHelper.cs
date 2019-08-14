@@ -1,6 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 
-namespace WpfApp1
+namespace ApplicationSwitcher
 {
     [StructLayout(LayoutKind.Sequential)]
     public struct RECT

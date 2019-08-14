@@ -13,7 +13,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.Diagnostics;
 
-namespace WpfApp1
+namespace ApplicationSwitcher
 {
     
     public class WindowSummary

@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 using System.Collections.Generic;
 using System.Diagnostics;
 
-namespace WpfApp1
+namespace ApplicationSwitcher
 {
     class WindowHelper
     {

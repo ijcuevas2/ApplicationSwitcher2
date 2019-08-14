@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Shapes;
 
-namespace WpfApp1
+namespace ApplicationSwitcher
 {
     public class ChildWindowSummary
     {

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-namespace WpfApp1
+namespace ApplicationSwitcher
 {
     class WindowManager
     {

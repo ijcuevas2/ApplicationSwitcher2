@@ -2,7 +2,7 @@
 using System.Windows;
 using System.ComponentModel;
 
-namespace WpfApp1
+namespace ApplicationSwitcher
 {
     /// <summary>
     /// Interaction logic for App.xaml
@@ -20,7 +20,7 @@ namespace WpfApp1
 
             _notifyIcon = new System.Windows.Forms.NotifyIcon();
             _notifyIcon.DoubleClick += (s, args) => ShowMainWindow();
-            _notifyIcon.Icon = WpfApp1.Properties.Resources.Icon1;
+            _notifyIcon.Icon = ApplicationSwitcher.Properties.Resources.Icon1;
             _notifyIcon.Visible = true;
             CreateContextMenu();
         }
