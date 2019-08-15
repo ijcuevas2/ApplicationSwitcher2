@@ -573,6 +573,12 @@ namespace ApplicationSwitcher
             this.Hide();
         }
 
+        void HandlerForCM(object sender, ContextMenuEventArgs e)
+        {
+            Console.WriteLine("Context Menu");
+            e.Handled = true;
+        }
+
         public void ProcessItemSwitch()
         {
             int index = programList.SelectedIndex;

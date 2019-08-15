@@ -58,6 +58,8 @@
         </Style>
     </Window.Resources>
     <StackPanel>
+    
+
     <TextBox  Text="{Binding Text, Mode=OneWay}" IsReadOnly="True" IsReadOnlyCaretVisible="True"
                   MaxLength="30" Name="textBoxElement" Background="#1D1D1D" TextElement.Foreground="White" 
                   Height="30"  
