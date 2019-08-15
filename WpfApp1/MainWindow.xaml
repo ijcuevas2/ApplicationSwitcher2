@@ -7,7 +7,7 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="Auto" 
         Width="Auto" 
-        SizeToContent="WidthAndHeight">
+        SizeToContent="WidthAndHeight" Opacity="0.94" AllowsTransparency="True" WindowStyle="None">
         <!--ShowInTaskbar="False">-->
     <Window.Resources>
         <Style TargetType="{x:Type Window}">
