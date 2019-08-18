@@ -206,7 +206,16 @@ namespace ApplicationSwitcher
                 // Call get the running child programs here? or just iterate 
                 Process process = Process.GetProcessById((int)summary.lpdwProcessId);
                 AutomationElement element = AutomationElement.FromHandle(summary.windowHandle);
-                Icon associatedProgramIcon = System.Drawing.Icon.ExtractAssociatedIcon(process.MainModule.FileName);
+                Icon associatedProgramIcon;
+                try
+                {
+                    associatedProgramIcon = System.Drawing.Icon.ExtractAssociatedIcon(process.MainModule.FileName);
+                }
+                catch (System.ComponentModel.Win32Exception ex)
+                {
+                    Console.WriteLine(ex);
+                    associatedProgramIcon = new Icon(SystemIcons.Application, 20, 20);
+                }
 
                 WindowSummary currWindowSummary = new WindowSummary();
                 currWindowSummary.Element = element;

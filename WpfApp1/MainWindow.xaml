@@ -7,7 +7,7 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="Auto" 
         Width="Auto" 
-        SizeToContent="WidthAndHeight" Opacity="0.94" AllowsTransparency="True" WindowStyle="None">
+        SizeToContent="WidthAndHeight" Opacity="0.92" AllowsTransparency="True" WindowStyle="None">
         <!--ShowInTaskbar="False">-->
     <Window.Resources>
         <Style TargetType="{x:Type Window}">
@@ -53,14 +53,13 @@
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
-            <!--<Setter Property="GridView.">
-            </Setter>-->
         </Style>
     </Window.Resources>
+    <Window.ContextMenu>
+        <ContextMenu Cursor="Pen" MaxHeight="5" MaxWidth="0" IsEnabled="False" IsHitTestVisible="False" Focusable="False"/>
+    </Window.ContextMenu>
     <StackPanel>
-    
-
-    <TextBox  Text="{Binding Text, Mode=OneWay}" IsReadOnly="True" IsReadOnlyCaretVisible="True"
+        <TextBox  Text="{Binding Text, Mode=OneWay}" IsReadOnly="True" IsReadOnlyCaretVisible="True"
                   MaxLength="30" Name="textBoxElement" Background="#1D1D1D" TextElement.Foreground="White" 
                   Height="30"  
                   Visibility="{Binding TextBoxVisibility}" 
@@ -86,7 +85,7 @@
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
-                    <GridViewColumn Width="Auto" Header="Icon" >
+                    <GridViewColumn Width="Auto" Header="Icon">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <Image Name="MyImage" Width="20" Source="{Binding ProgramIcon}" />

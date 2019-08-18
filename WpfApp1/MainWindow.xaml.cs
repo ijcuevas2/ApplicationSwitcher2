@@ -39,6 +39,19 @@ namespace ApplicationSwitcher
             // NOTE: This is a test to get all the running programs
             // MyEnumWindows.GetWindowTitles(true);
 
+            initializeWindowSummaryList();
+
+            programList.ItemsSource = filteredWindowSummaries;
+            Window window = Application.Current.MainWindow;
+            DataContext = this;
+            window.WindowStartupLocation = WindowStartupLocation.CenterScreen;
+            window.WindowStyle = WindowStyle.None;
+            window.ResizeMode = ResizeMode.NoResize;
+            // MainWindow_Hide();
+        }
+
+        private void initializeWindowSummaryList()
+        {
             Process[] processList = Process.GetProcesses();
             // TODO: Refactor this
             List<Process> mainProcessList = WindowSummaryManager.GetRunningPrograms();
@@ -50,14 +63,31 @@ namespace ApplicationSwitcher
             {
                 this.filteredWindowSummaries.Add(this.windowSummaries[i]);
             }
+        }
 
-            programList.ItemsSource = filteredWindowSummaries;
-            Window window = Application.Current.MainWindow;
-            DataContext = this;
-            window.WindowStartupLocation = WindowStartupLocation.CenterScreen;
-            window.WindowStyle = WindowStyle.None;
-            window.ResizeMode = ResizeMode.NoResize;
-            // MainWindow_Hide();
+        private void clearWindowSummaries()
+        {
+            // TODO: Refactor this section
+            this.windowSummaries.Clear();
+            MyEnumWindows.childWindowSummaries.Clear();
+            this.filteredWindowSummaries.Clear();
+        }
+
+        private void reloadWindowSummaryList()
+        {
+            Process[] processList = Process.GetProcesses();
+
+            // TODO: Refactor this
+            clearWindowSummaries();
+            List<Process> mainProcessList = WindowSummaryManager.GetRunningPrograms();
+
+            this.windowSummaries = WindowSummaryManager.getWindowSummaryInfo(mainProcessList);
+
+
+            for (int i = 0; i < windowSummaries.Count; i++)
+            {
+                this.filteredWindowSummaries.Add(this.windowSummaries[i]);
+            }
         }
 
 
@@ -66,18 +96,19 @@ namespace ApplicationSwitcher
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
+
         private int _programIndex = 0;
         public int ProgramIndex {
             get { return _programIndex; }
             set
             {
-                Console.WriteLine("windowSummaries.Count: {0}", windowSummaries.Count);
-                if (windowSummaries.Count < 1)
+                Console.WriteLine("windowSummaries.Count: {0}", filteredWindowSummaries.Count);
+                if (filteredWindowSummaries.Count < 1)
                 {
                     return;
                 }
 
-                int upperBound = windowSummaries.Count - 1;
+                int upperBound = filteredWindowSummaries.Count - 1;
 
                 if (value < 0)
                 {
@@ -361,6 +392,33 @@ namespace ApplicationSwitcher
             }
         }
 
+        protected override void OnKeyDown(KeyEventArgs e)
+        {
+            Console.WriteLine("e.SystemKey: {0}", e.SystemKey);
+            Console.WriteLine("KeyModifiers: {0}", Keyboard.Modifiers);
+            Console.WriteLine("e.Key: {0}", e.Key);
+
+            if (Keyboard.Modifiers == ModifierKeys.Alt && e.SystemKey == Key.Space)
+            {
+                e.Handled = true;
+            }
+
+            if (Keyboard.Modifiers == ModifierKeys.Alt && e.SystemKey == Key.Tab)
+            {
+                Console.WriteLine("Alt + Tab Pressed!!!");
+            }
+
+            if (e.SystemKey == Key.LeftAlt && e.SystemKey == Key.Tab)
+            {
+                Console.WriteLine("Alt + Tab Pressed!!!");
+            }
+            
+            else
+            {
+                base.OnKeyDown(e);
+            }
+        }
+
         public void setCaretIndex(int index)
         {
             CaretIndex = index;
@@ -458,17 +516,11 @@ namespace ApplicationSwitcher
                         }
                     }
 
-                    // if (isSpace(currentKey))
-                    // {
-                    //     char currChar = ' ';
-                    //     Text += currChar;
-                    //     // textBoxElement.CaretIndex = Text.Length - 1;
-                    //     if (isAlt)
-                    //     {
-                    //         return 1;
-                    //     }
-                    //     goto NextHook;
-                    // }
+                    if (isSpace(currentKey))
+                    {
+                        char currChar = ' ';
+                        Text += currChar;
+                    }
 
                     if (isKeyEquals(currentKey, Key.RightShift))
                     {
@@ -517,7 +569,11 @@ namespace ApplicationSwitcher
                     Boolean isAltTab = lParam.vkCode == 0x09 && lParam.flags == 32;
                     if (isAltTab)
                     {
-                        this.MainWindow_Show();
+                        if (!this.IsVisible)
+                        {
+                            this.MainWindow_Show();
+                        }
+
                         isKeyboardShortcut = true;
                         Console.WriteLine("isShiftKey: {0}", isShiftKey);
                         if (isShiftKey) {
@@ -545,6 +601,7 @@ namespace ApplicationSwitcher
                     // NOTE: Be Careful
                     if (isAlt)
                     {
+                        Console.WriteLine("MainWindow_Hide");
                         MainWindow_Hide();
                         ProcessItemSwitch();
                     }
@@ -562,10 +619,13 @@ namespace ApplicationSwitcher
 
         public void MainWindow_Show()
         {
-            this.Show();
-            this.Topmost = true;
+            Console.WriteLine("MainWindow_Show()");
+            reloadWindowSummaryList();
             this.Text = "";
             this.setTextBoxCollapsed();
+            this.Show();
+            // this.Focus();
+            this.Topmost = true;
         }
 
         public void MainWindow_Hide()
@@ -584,7 +644,17 @@ namespace ApplicationSwitcher
             int index = programList.SelectedIndex;
             WindowSummary currSummary = filteredWindowSummaries[index];
             Console.WriteLine("Curr Summary Program Name: {0}", currSummary.ProgramName);
-            currSummary.Element.SetFocus();
+
+            // TODO: Handle Exception
+            try
+            {
+                currSummary.Element.SetFocus();
+            }
+
+            catch (Exception)
+            {
+                MainWindow_Hide();
+            }
         }
 
         //public void Set Screen

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Windows;
 using System.ComponentModel;
+using System.Windows.Controls;
 
 namespace ApplicationSwitcher
 {
@@ -52,6 +53,11 @@ namespace ApplicationSwitcher
             MainWindow.Close();
             _notifyIcon.Dispose();
             _notifyIcon = null;
+        }
+
+        public void HandlerForCM(object sender, ContextMenuEventArgs e)
+        {
+            e.Handled = true;
         }
 
         public void ShowMainWindow()
