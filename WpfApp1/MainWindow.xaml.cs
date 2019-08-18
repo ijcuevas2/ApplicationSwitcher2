@@ -34,20 +34,15 @@ namespace ApplicationSwitcher
             Style = (Style)FindResource(typeof(Window));
             Keyevent();
             this.KeyDown += new KeyEventHandler(MainWindow_KeyDown);
-            // Console.WriteLine("App.Current.Windows:", App.Current.Windows);
-            // Console.WriteLine("Hello");
-            // NOTE: This is a test to get all the running programs
-            // MyEnumWindows.GetWindowTitles(true);
 
             initializeWindowSummaryList();
-
             programList.ItemsSource = filteredWindowSummaries;
             Window window = Application.Current.MainWindow;
             DataContext = this;
             window.WindowStartupLocation = WindowStartupLocation.CenterScreen;
             window.WindowStyle = WindowStyle.None;
             window.ResizeMode = ResizeMode.NoResize;
-            // MainWindow_Hide();
+            MainWindow_Hide();
         }
 
         private void initializeWindowSummaryList()
@@ -102,7 +97,6 @@ namespace ApplicationSwitcher
             get { return _programIndex; }
             set
             {
-                Console.WriteLine("windowSummaries.Count: {0}", filteredWindowSummaries.Count);
                 if (filteredWindowSummaries.Count < 1)
                 {
                     return;
@@ -164,7 +158,6 @@ namespace ApplicationSwitcher
                 {
                     Boolean addingText = value.Length > _text.Length;
                     _text = value;
-                    // textBoxElement.CaretIndex = 2;
 
                     this.NotifyPropertyChanged();
                     this.updateWindowSummaries();
@@ -181,8 +174,7 @@ namespace ApplicationSwitcher
             }
         }
         
-        // NOTE: notify property changed is not necessary here
-        // used after updating text length
+        // NOTE: NotifyPropertyChanged is not called here
         private int _caretIndex;
         public int CaretIndex
         {
@@ -216,8 +208,6 @@ namespace ApplicationSwitcher
 
         public void updateWindowSummaries()
         {
-            Console.WriteLine("updateWindowSummaries!!");
-            // filteredWindowSummaries = new ObservableCollection<WindowSummary>();
             filteredWindowSummaries.Clear();
             for (int i = 0; i < windowSummaries.Count; i++)
             {
@@ -233,33 +223,22 @@ namespace ApplicationSwitcher
                     filteredWindowSummaries.Add(windowSummaries[i]);
                 }
             }
-
-            //this.ProgramIndex = 0;
         }
 
         public void decrementCursorIndex()
         {
             CaretIndex -= 1;
-            Console.WriteLine("CaretIndex (decrement cursor): {0}", CaretIndex);
+            System.Diagnostics.Debug.WriteLine("CaretIndex (decrement cursor): {0}", CaretIndex);
             textBoxElement.CaretIndex = CaretIndex;
         }
 
         public void incrementCursorIndex()
         {
-            // CaretIndex = getCurrCaratIndex();
-            // CaretIndex = 2;
-            Console.WriteLine("CaretIndex Before Increment: {0}", prevCaretIndex);
+            System.Diagnostics.Debug.WriteLine("CaretIndex Before Increment: {0}", prevCaretIndex);
             CaretIndex++;
-            Console.WriteLine("CaretIndex After Increment: {0}", prevCaretIndex);
+            System.Diagnostics.Debug.WriteLine("CaretIndex After Increment: {0}", prevCaretIndex);
             textBoxElement.CaretIndex = CaretIndex;
-            // Console.WriteLine("After CaratIndex: {0}", textBoxElement.CaretIndex);
         }
-
-
-        // public static void Mouse_Enter(object sender, MouseEventArgs e)
-        // {
-        //     programList.SelectedItem = e.
-        // }
 
         public void MainWindow_KeyDown(object sender, KeyEventArgs e)
         {
@@ -279,7 +258,6 @@ namespace ApplicationSwitcher
 
         public Boolean isAlphaNumericKeyPress(Key key)
         {
-            // int keyValue = (int)key;
             String keyString = key.ToString();
             if (keyString.Length != 1)
             {
@@ -287,9 +265,6 @@ namespace ApplicationSwitcher
             }
 
             char currChar = keyString[0];
-
-            Console.WriteLine("currChar: {0}", currChar);
-            Console.WriteLine("key: {0}, key.ToString(): {1}", key, key.ToString());
 
             // letters, numbers, keypad
             return ((currChar >= 'A' && currChar <= 'Z'))
@@ -299,7 +274,6 @@ namespace ApplicationSwitcher
 
         public Boolean isSpace(Key key)
         {
-            // Console.WriteLine("key.ToString(): {0}", key.ToString());
             if (key == Key.Space)
             {
                 return true;
@@ -310,7 +284,6 @@ namespace ApplicationSwitcher
 
         public Boolean isBackSpace(Key key)
         {
-            // Console.WriteLine("key.ToString(): {0}", key.ToString());
             if (key == Key.Back)
             {
                 return true;
@@ -394,25 +367,15 @@ namespace ApplicationSwitcher
 
         protected override void OnKeyDown(KeyEventArgs e)
         {
-            Console.WriteLine("e.SystemKey: {0}", e.SystemKey);
-            Console.WriteLine("KeyModifiers: {0}", Keyboard.Modifiers);
-            Console.WriteLine("e.Key: {0}", e.Key);
+            System.Diagnostics.Debug.WriteLine("e.SystemKey: {0}", e.SystemKey);
+            System.Diagnostics.Debug.WriteLine("KeyModifiers: {0}", Keyboard.Modifiers);
+            System.Diagnostics.Debug.WriteLine("e.Key: {0}", e.Key);
 
             if (Keyboard.Modifiers == ModifierKeys.Alt && e.SystemKey == Key.Space)
             {
                 e.Handled = true;
             }
 
-            if (Keyboard.Modifiers == ModifierKeys.Alt && e.SystemKey == Key.Tab)
-            {
-                Console.WriteLine("Alt + Tab Pressed!!!");
-            }
-
-            if (e.SystemKey == Key.LeftAlt && e.SystemKey == Key.Tab)
-            {
-                Console.WriteLine("Alt + Tab Pressed!!!");
-            }
-            
             else
             {
                 base.OnKeyDown(e);
@@ -427,10 +390,9 @@ namespace ApplicationSwitcher
 
         private int LowLevelKeyboardProc(int nCode, int wParam, ref KBDLLHOOKSSTRUCT lParam)
         {
-            // Console.WriteLine("LowLevelKeyboardProc");
             CaretIndex = getCurrCaretIndex();
-            Console.WriteLine("CaretIndex: {0}", CaretIndex);
-            Console.WriteLine("textBoxElement.CaretIndex:{0}", textBoxElement.CaretIndex);
+            System.Diagnostics.Debug.WriteLine("CaretIndex: {0}", CaretIndex);
+            System.Diagnostics.Debug.WriteLine("textBoxElement.CaretIndex:{0}", textBoxElement.CaretIndex);
 
             if (nCode >= 0)
             {
@@ -438,23 +400,11 @@ namespace ApplicationSwitcher
                 Boolean isKeyUp = wParam == 257 || wParam == 261;
                 if (isKeyDown)
                 {
-                    // case 256: // WM_KEYDOWN
-                    // case 260: // WM_SYSKEYDOWN
-                    // Console.WriteLine("Pressing Shift?: {0}", (lParam.vkCode == 0xA0 || lParam.vkCode == 0xA1));
-                    // Console.WriteLine("lParam.vkCode: {0}", lParam.vkCode);
                     Key currentKey = KeyInterop.KeyFromVirtualKey(lParam.vkCode);
-                    // Console.WriteLine("isAlphaNumericKeyPress(currentKey): {0}", isAlphaNumericKeyPress(currentKey));
-                    // Console.WriteLine("isSpace(currentKey): {0}", isSpace(currentKey));
-                    // Console.WriteLine("Text: {0}", Text);
                     Boolean isShiftKey = (Keyboard.Modifiers & ModifierKeys.Shift) != 0;
                     Boolean isAlt = lParam.flags == 32;
                     Boolean isCtrlModifier = (Keyboard.Modifiers & ModifierKeys.Control) != 0;
                     Boolean isAltModifier = (Keyboard.Modifiers & ModifierKeys.Alt) != 0;
-                    // Console.WriteLine("isAlt: {0}", isAlt);
-                    //if (isAlt)
-                    //{
-                    //    MainWindow_Show();
-                    //}
 
                     if (isCtrlModifier && isKeyEquals(currentKey, Key.A))
                     {
@@ -468,8 +418,7 @@ namespace ApplicationSwitcher
                             int selectionStart = textBoxElement.SelectionStart;
                             int selectionLength = textBoxElement.SelectionLength;
                             int SelectionEnd = textBoxElement.SelectionStart + textBoxElement.SelectionLength;
-                            // CaretIndex = getCurrCaretIndex();
-                            Console.WriteLine("CaretIndex (In Backspace): {0}", CaretIndex);
+                            System.Diagnostics.Debug.WriteLine("CaretIndex (In Backspace): {0}", CaretIndex);
 
                             if (selectionLength > 0)
                             {
@@ -497,7 +446,6 @@ namespace ApplicationSwitcher
                         goto NextHook;
                     }
 
-                    // TODO: make a dependency property
                     if (isKeyEquals(currentKey, Key.Home))
                     {
                         CaretIndex = 0;
@@ -525,8 +473,8 @@ namespace ApplicationSwitcher
                     if (isKeyEquals(currentKey, Key.RightShift))
                     {
                         // MainWindow_Hide();
-                        Console.WriteLine("textBoxElement.SelectionStart: {0}", textBoxElement.SelectionStart);
-                        Console.WriteLine("textBoxElement.SelectionLength: {0}", textBoxElement.SelectionLength);
+                        System.Diagnostics.Debug.WriteLine("textBoxElement.SelectionStart: {0}", textBoxElement.SelectionStart);
+                        System.Diagnostics.Debug.WriteLine("textBoxElement.SelectionLength: {0}", textBoxElement.SelectionLength);
                     }
 
                     // TODO: check for unnecessary decrementing or incrementing
@@ -555,17 +503,11 @@ namespace ApplicationSwitcher
                         }
 
                         Text += currChar;
-                        // textBoxElement.Car;
-                        // if (isAlt)
-                        // {
-                        //     textBoxElement.Text += currChar;
-                        // }
 
                         // NOTE: this is the fix
                         goto NextHook;
                     }
 
-                    // Console.WriteLine("Mod", lParam.vkCode);
                     Boolean isAltTab = lParam.vkCode == 0x09 && lParam.flags == 32;
                     if (isAltTab)
                     {
@@ -576,12 +518,9 @@ namespace ApplicationSwitcher
                         }
 
                         isKeyboardShortcut = true;
-                        Console.WriteLine("isShiftKey: {0}", isShiftKey);
                         if (isShiftKey) {
-                            Console.WriteLine("Pressing Alt + Shift + Tab");
                             ProgramIndex--;
                         } else {
-                            Console.WriteLine("Pressing Alt + Tab");
                             ProgramIndex++;
                         }
 
@@ -590,19 +529,14 @@ namespace ApplicationSwitcher
                     }
                 }
 
-                // case 257: // WM_KEYUP
-                // case 261: // WM_SYSKEYUP
-                // break;
                 if (isKeyUp)
                 {
-                    // Boolean isAlt = lParam.flags == 32;
                     Boolean isAlt = lParam.vkCode == 0xA4 || lParam.vkCode == 0xA5;
-                    // Console.WriteLine("isAlt: {0}", isAlt);
-                    // Console.WriteLine("lParam.vkCode: {0}", lParam.vkCode);
+
                     // NOTE: Be Careful
                     if (isAlt)
                     {
-                        Console.WriteLine("MainWindow_Hide");
+                        System.Diagnostics.Debug.WriteLine("MainWindow_Hide");
                         MainWindow_Hide();
                         ProcessItemSwitch();
                     }
@@ -615,7 +549,7 @@ namespace ApplicationSwitcher
 
         public void Main_TextChanged(object sender, EventArgs e)
         {
-            Console.WriteLine("TextChanged!: {0}", textBoxElement.Text);
+            System.Diagnostics.Debug.WriteLine("TextChanged!: {0}", textBoxElement.Text);
         }
 
         public void resetProgramIndex()
@@ -633,7 +567,6 @@ namespace ApplicationSwitcher
 
         public void MainWindow_Show()
         {
-            Console.WriteLine("MainWindow_Show()");
             reloadWindowSummaryList();
             this.Text = "";
             this.setTextBoxCollapsed();
@@ -650,7 +583,6 @@ namespace ApplicationSwitcher
 
         void HandlerForCM(object sender, ContextMenuEventArgs e)
         {
-            Console.WriteLine("Context Menu");
             e.Handled = true;
         }
 
@@ -658,7 +590,6 @@ namespace ApplicationSwitcher
         {
             int index = programList.SelectedIndex;
             WindowSummary currSummary = filteredWindowSummaries[index];
-            Console.WriteLine("Curr Summary Program Name: {0}", currSummary.ProgramName);
 
             // TODO: Handle Exception
             try

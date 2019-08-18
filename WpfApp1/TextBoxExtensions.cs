@@ -31,8 +31,6 @@ namespace ApplicationSwitcher
                 return;
             }
 
-            Console.WriteLine("NonIntrusiveTextChanged");
-
             var caretIndex = textBox.CaretIndex;
             var selectionStart = textBox.SelectionStart;
             var selectionLength = textBox.SelectionLength;

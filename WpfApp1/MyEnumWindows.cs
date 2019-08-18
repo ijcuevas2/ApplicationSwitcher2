@@ -60,7 +60,6 @@ namespace ApplicationSwitcher
             {
                 ChildWindowSummary childWindowSummary = new ChildWindowSummary(title, lpdwProcessId, testWindowHandle);
                 childWindowSummaries.Add(childWindowSummary);
-                Console.WriteLine("Title: {0}, Process Id; {1}", title, lpdwProcessId);
             }
 
 
@@ -102,7 +101,6 @@ namespace ApplicationSwitcher
 
         public static Boolean iterateThroughDict(Dictionary<string, long> dict, WINDOWINFO info, Boolean extended)
         {
-            //Console.WriteLine("iterateThroughDict Size: {0}", dict.Count);
             foreach(KeyValuePair<string, long> entry in dict)
             {
                 long value = entry.Value;
@@ -111,7 +109,7 @@ namespace ApplicationSwitcher
                 if (!extended)
                 {
                     match = (info.dwStyle & value) != 0;
-                    // Console.WriteLine("Hex: {0:X}", info.dwStyle);
+                    // System.Diagnostics.Debug.WriteLine("Hex: {0:X}", info.dwStyle);
                     //if ((info.dwStyle & dict["WS_MINIMIZE"]) == 0)
                     //{
                     //    continue;
@@ -120,7 +118,7 @@ namespace ApplicationSwitcher
 
                 else
                 {
-                    // Console.WriteLine("Hex Extended: {1:X}", info.dwExStyle);
+                    // System.Diagnostics.Debug.WriteLine("Hex Extended: {1:X}", info.dwExStyle);
                     match = (info.dwExStyle & value) != 0;
                     //if ((info.dwExStyle & dict["WS_EX_TOPMOST"]) == 0)
                     //{
@@ -128,7 +126,7 @@ namespace ApplicationSwitcher
                     //}
                 }
 
-                // Console.WriteLine("Match: {0}", match);
+                // System.Diagnostics.Debug.WriteLine("Match: {0}", match);
 
                 if (match)
                 {
