@@ -165,21 +165,11 @@ namespace ApplicationSwitcher
                 if (!extended)
                 {
                     match = (info.dwStyle & value) != 0;
-                    //Console.WriteLine("Hex: {0:X}", info.dwStyle);
-                    //if ((info.dwStyle & dict["WS_MINIMIZE"]) == 0)
-                    //{
-                    //    continue;
-                    //}
                 }
 
                 else
                 {
                     match = (info.dwExStyle & value) != 0;
-                    //Console.WriteLine("Hex Extended: {0:X}", info.dwExStyle);
-                    //if ((info.dwExStyle & dict["WS_EX_TOPMOST"]) == 0)
-                    //{
-                    //    continue;
-                    //}
                 }
 
                 Console.WriteLine("Match: {0}", match);

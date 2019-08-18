@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 using System.Collections.Generic;
-using System.Windows;
-using System.Windows.Shapes;
 using System.Text;
 
 namespace ApplicationSwitcher
@@ -55,11 +53,9 @@ namespace ApplicationSwitcher
 
         public static bool EnumWindowsCallback(IntPtr testWindowHandle, IntPtr includeChildren)
         {
-            // NOTE: In the case of chrome, it was created by the same process
             string title = MyEnumWindows.GetWindowTitle(testWindowHandle);
             uint lpdwProcessId = 0;
             GetWindowThreadProcessId(testWindowHandle, out lpdwProcessId);
-            //if (hasChildProgramWindow(testWindowHandle))
             if (hasChildProgramWindow(testWindowHandle) && title != "")
             {
                 ChildWindowSummary childWindowSummary = new ChildWindowSummary(title, lpdwProcessId, testWindowHandle);
@@ -166,6 +162,5 @@ namespace ApplicationSwitcher
             GetWindowText(new HandleRef(o, windowHandle), stringBuilder, stringBuilder.Capacity);
             return stringBuilder.ToString();
         }
-
     }
 }
