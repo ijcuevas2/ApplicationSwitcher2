@@ -167,19 +167,5 @@ namespace ApplicationSwitcher
             return stringBuilder.ToString();
         }
 
-        //private static string GetWindowTitle(IntPtr windowHandle)
-        //{
-        //    uint SMTO_ABORTIFHUNG = 0x0002;
-        //    uint WM_GETTEXT = 0xD;
-        //    int MAX_STRING_SIZE = 32768;
-        //    IntPtr result;
-        //    string title = string.Empty;
-        //    IntPtr memoryHandle = Marshal.AllocCoTaskMem(MAX_STRING_SIZE);
-        //    Marshal.Copy(title.ToCharArray(), 0, memoryHandle, title.Length);
-        //    MyEnumWindows.SendMessageTimeout(windowHandle, WM_GETTEXT, (IntPtr)MAX_STRING_SIZE, memoryHandle, SMTO_ABORTIFHUNG, (uint)1000, out result);
-        //    title = Marshal.PtrToStringAuto(memoryHandle);
-        //    Marshal.FreeCoTaskMem(memoryHandle);
-        //    return title;
-        //}
     }
 }
