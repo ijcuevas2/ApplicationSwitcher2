@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 using System.Collections.Generic;
-using System.Windows;
-using System.Windows.Shapes;
+using System.Text;
 
 namespace ApplicationSwitcher
 {
@@ -46,7 +45,6 @@ namespace ApplicationSwitcher
         public static List<string> windowTitles = new List<string>();
         public static List<ChildWindowSummary> childWindowSummaries = new List<ChildWindowSummary>();
 
-
         public static List<string> GetWindowTitles(bool includeChildren)
         {
             EnumWindows(MyEnumWindows.EnumWindowsCallback, includeChildren ? (IntPtr)1 : IntPtr.Zero);
@@ -55,16 +53,13 @@ namespace ApplicationSwitcher
 
         public static bool EnumWindowsCallback(IntPtr testWindowHandle, IntPtr includeChildren)
         {
-            // NOTE: In the case of chrome, it was created by the same process
             string title = MyEnumWindows.GetWindowTitle(testWindowHandle);
             uint lpdwProcessId = 0;
             GetWindowThreadProcessId(testWindowHandle, out lpdwProcessId);
-            //if (hasChildProgramWindow(testWindowHandle))
             if (hasChildProgramWindow(testWindowHandle) && title != "")
             {
                 ChildWindowSummary childWindowSummary = new ChildWindowSummary(title, lpdwProcessId, testWindowHandle);
                 childWindowSummaries.Add(childWindowSummary);
-                Console.WriteLine("Title: {0}, Process Id; {1}", title, lpdwProcessId);
             }
 
 
@@ -94,7 +89,6 @@ namespace ApplicationSwitcher
             //windowStyles.Add("WS_MAXIMIZE", 0x01000000L);
             windowStyles.Add("WS_MINIMIZE", 0x20000000L);
 
-            // NOTE: Not necessary I guess?
             Dictionary<string, long> extendedWindowStyles = new Dictionary<string, long>();
             extendedWindowStyles.Add("WS_EX_TOPMOST", 0x00000008L);
 
@@ -106,7 +100,6 @@ namespace ApplicationSwitcher
 
         public static Boolean iterateThroughDict(Dictionary<string, long> dict, WINDOWINFO info, Boolean extended)
         {
-            //Console.WriteLine("iterateThroughDict Size: {0}", dict.Count);
             foreach(KeyValuePair<string, long> entry in dict)
             {
                 long value = entry.Value;
@@ -115,7 +108,7 @@ namespace ApplicationSwitcher
                 if (!extended)
                 {
                     match = (info.dwStyle & value) != 0;
-                    // Console.WriteLine("Hex: {0:X}", info.dwStyle);
+                    // System.Diagnostics.Debug.WriteLine("Hex: {0:X}", info.dwStyle);
                     //if ((info.dwStyle & dict["WS_MINIMIZE"]) == 0)
                     //{
                     //    continue;
@@ -124,15 +117,13 @@ namespace ApplicationSwitcher
 
                 else
                 {
-                    // Console.WriteLine("Hex Extended: {1:X}", info.dwExStyle);
+                    // System.Diagnostics.Debug.WriteLine("Hex Extended: {1:X}", info.dwExStyle);
                     match = (info.dwExStyle & value) != 0;
                     //if ((info.dwExStyle & dict["WS_EX_TOPMOST"]) == 0)
                     //{
                     //    continue;
                     //}
                 }
-
-                // Console.WriteLine("Match: {0}", match);
 
                 if (match)
                 {
@@ -152,19 +143,19 @@ namespace ApplicationSwitcher
             return match;
         }
 
+        [DllImport("user32.dll", CharSet = CharSet.Auto)]
+        public static extern int GetWindowTextLength(HandleRef hWnd);
+
+        [DllImport("user32.dll", CharSet = CharSet.Auto)]
+        public static extern int GetWindowText(HandleRef hWnd, StringBuilder lpString, int nMaxCount);
+
         private static string GetWindowTitle(IntPtr windowHandle)
         {
-            uint SMTO_ABORTIFHUNG = 0x0002;
-            uint WM_GETTEXT = 0xD;
-            int MAX_STRING_SIZE = 32768;
-            IntPtr result;
-            string title = string.Empty;
-            IntPtr memoryHandle = Marshal.AllocCoTaskMem(MAX_STRING_SIZE);
-            Marshal.Copy(title.ToCharArray(), 0, memoryHandle, title.Length);
-            MyEnumWindows.SendMessageTimeout(windowHandle, WM_GETTEXT, (IntPtr)MAX_STRING_SIZE, memoryHandle, SMTO_ABORTIFHUNG, (uint)1000, out result);
-            title = Marshal.PtrToStringAuto(memoryHandle);
-            Marshal.FreeCoTaskMem(memoryHandle);
-            return title;
+            object o = new object();
+            int capacity = GetWindowTextLength(new HandleRef(o, windowHandle)) * 2;
+            StringBuilder stringBuilder = new StringBuilder(capacity);
+            GetWindowText(new HandleRef(o, windowHandle), stringBuilder, stringBuilder.Capacity);
+            return stringBuilder.ToString();
         }
     }
 }

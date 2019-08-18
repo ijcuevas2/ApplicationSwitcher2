@@ -19,13 +19,11 @@ namespace ApplicationSwitcher
 
         public static List<IntPtr> run()
         {
-            Console.WriteLine("Running Getting Processes");
             Process[] processes = Process.GetProcessesByName("chrome");
             List<IntPtr> windows = new List<IntPtr>();
 
             foreach(Process p in processes)
             {
-                Console.WriteLine("Process: {0}", p.ProcessName);
                 IEnumerable<IntPtr> w = GetRootWindowsOfProcess(p.Id);
                 windows.AddRange(w);
             }

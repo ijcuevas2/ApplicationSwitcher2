@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Windows;
-using System.Windows.Data;
-using System.Windows.Input;
 using System.Windows.Automation;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -10,7 +8,6 @@ using System.Collections.ObjectModel;
 using System.Runtime.InteropServices;
 using System.Windows.Interop;
 using System.Drawing;
-using System.Drawing.Imaging;
 using System.Diagnostics;
 
 namespace ApplicationSwitcher
@@ -18,8 +15,6 @@ namespace ApplicationSwitcher
     
     public class WindowSummary
     {
-        // TODO: include window desktop number
-        // Ultimately, a program has to be in a window summary
         public AutomationElement Element { get; set; }
         public ImageSource ProgramIcon { get; set; }
         public string ProgramName { get; set; }
@@ -60,7 +55,8 @@ namespace ApplicationSwitcher
         public ushort atomWindowType;
         public ushort wCreatorVersion;
 
-        public WINDOWINFO(Boolean? filler): this() // Allows for automatic initialization of "cbSize" with "new WINDOWINFO(null / true / false)"
+        // Allows for automatic initialization of "cbSize" with "new WINDOWINFO(null / true / false)"
+        public WINDOWINFO(Boolean? filler): this() 
         {
             cbSize = (UInt32)(Marshal.SizeOf(typeof(WINDOWINFO)));
         }
@@ -68,12 +64,9 @@ namespace ApplicationSwitcher
 
     public class WindowSummaryManager
     {
-        // List<List<Process>> programProcessList; 
         public static Dictionary<uint, ProgramSummary> programSummaryDict = new Dictionary<uint, ProgramSummary>();
-
         public static List<Process> GetRunningPrograms()
         {
-            Console.WriteLine("GetRunningPrograms()");
             Process[] processList = Process.GetProcesses();
             List<Process> mainProcessList = new List<Process>();
 
@@ -84,11 +77,6 @@ namespace ApplicationSwitcher
                     mainProcessList.Add(process);
                 }
             }
-
-            // NOTE: Done Adding Processes
-
-            // NOTE: this is somewhat based off of an incorrect assumption
-            Console.WriteLine("Done Adding Program Summaries");
 
             return mainProcessList;
         }
@@ -101,11 +89,6 @@ namespace ApplicationSwitcher
             {
                 if (!String.IsNullOrEmpty(process.MainWindowTitle))
                 {
-                    //ProgramSummary currProgramSummary = new ProgramSummary(process, icon);
-                    //uint processId = (uint)process.Id;
-                    //programSummaryDict.Add(processId, currProgramSummary);
-                    //MyEnumWindows.GetWindowTitles(true);
-                    //Console.WriteLine("MyEnumWindows Result");
                     foreach (ChildWindowSummary childWindowSummary in MyEnumWindows.childWindowSummaries)
                     {
                         ProgramSummary currSummary = null;
@@ -118,11 +101,10 @@ namespace ApplicationSwitcher
 
                 foreach(KeyValuePair<uint, ProgramSummary> entry in programSummaryDict)
                 {
-                    Console.WriteLine("Current childProgramSummaries Length: {0}", entry.Value.childProgramSummaries.Count);
                     foreach (ChildWindowSummary summary in entry.Value.childProgramSummaries)
                     {
-                        Console.WriteLine("Summary Title: {0}", summary.title);
-                        Console.WriteLine("Summary Process: {0}", summary.lpdwProcessId);
+                        //System.Diagnostics.Debug.WriteLine("Summary Title: {0}", summary.title);
+                        //System.Diagnostics.Debug.WriteLine("Summary Process: {0}", summary.lpdwProcessId);
 
                         WINDOWINFO info = new WINDOWINFO();
                         info.cbSize = (UInt32)Marshal.SizeOf(info);
@@ -144,7 +126,6 @@ namespace ApplicationSwitcher
             windowStyles.Add("WS_MAXIMIZE", 0x01000000L);
             windowStyles.Add("WS_MINIMIZE", 0x20000000L);
 
-            // NOTE: Not necessary I guess?
             Dictionary<string, long> extendedWindowStyles = new Dictionary<string, long>();
             extendedWindowStyles.Add("WS_EX_TOPMOST", 0x00000008L);
 
@@ -156,7 +137,6 @@ namespace ApplicationSwitcher
 
         public static Boolean iterateThroughDict(Dictionary<string, long> dict, WINDOWINFO info, Boolean extended)
         {
-            Console.WriteLine("iterateThroughDict Size: {0}", dict.Count);
             foreach(KeyValuePair<string, long> entry in dict)
             {
                 long value = entry.Value;
@@ -165,28 +145,16 @@ namespace ApplicationSwitcher
                 if (!extended)
                 {
                     match = (info.dwStyle & value) != 0;
-                    //Console.WriteLine("Hex: {0:X}", info.dwStyle);
-                    //if ((info.dwStyle & dict["WS_MINIMIZE"]) == 0)
-                    //{
-                    //    continue;
-                    //}
                 }
 
                 else
                 {
                     match = (info.dwExStyle & value) != 0;
-                    //Console.WriteLine("Hex Extended: {0:X}", info.dwExStyle);
-                    //if ((info.dwExStyle & dict["WS_EX_TOPMOST"]) == 0)
-                    //{
-                    //    continue;
-                    //}
                 }
 
-                Console.WriteLine("Match: {0}", match);
 
                 if (match)
                 {
-                    Console.WriteLine("");
                     if (entry.Key == "WS_EX_TOPMOST" || entry.Key == "WS_MINIMIZE")
                     {
                         return true;
@@ -203,7 +171,6 @@ namespace ApplicationSwitcher
             MyEnumWindows.GetWindowTitles(true);
             foreach (ChildWindowSummary summary in MyEnumWindows.childWindowSummaries)
             {
-                // Call get the running child programs here? or just iterate 
                 Process process = Process.GetProcessById((int)summary.lpdwProcessId);
                 AutomationElement element = AutomationElement.FromHandle(summary.windowHandle);
                 Icon associatedProgramIcon;
@@ -213,7 +180,7 @@ namespace ApplicationSwitcher
                 }
                 catch (System.ComponentModel.Win32Exception ex)
                 {
-                    Console.WriteLine(ex);
+                    System.Diagnostics.Debug.WriteLine("Win32Exception ex: {0}", ex);
                     associatedProgramIcon = new Icon(SystemIcons.Application, 20, 20);
                 }
 
