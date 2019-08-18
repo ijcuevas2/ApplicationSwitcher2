@@ -213,7 +213,7 @@ namespace ApplicationSwitcher
                 }
                 catch (System.ComponentModel.Win32Exception ex)
                 {
-                    Console.WriteLine(ex);
+                    System.Diagnostics.Debug.WriteLine("Win32Exception ex: {0}", ex);
                     associatedProgramIcon = new Icon(SystemIcons.Application, 20, 20);
                 }
 

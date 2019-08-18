@@ -572,6 +572,7 @@ namespace ApplicationSwitcher
                         if (!this.IsVisible)
                         {
                             this.MainWindow_Show();
+                            return 1;
                         }
 
                         isKeyboardShortcut = true;
@@ -617,15 +618,29 @@ namespace ApplicationSwitcher
             Console.WriteLine("TextChanged!: {0}", textBoxElement.Text);
         }
 
+        public void resetProgramIndex()
+        {
+            if (filteredWindowSummaries.Count > 1)
+            {
+                this.ProgramIndex = 1;
+            }
+
+            else
+            {
+                this.ProgramIndex = 0;
+            }
+        }
+
         public void MainWindow_Show()
         {
             Console.WriteLine("MainWindow_Show()");
             reloadWindowSummaryList();
             this.Text = "";
             this.setTextBoxCollapsed();
+            this.resetProgramIndex();
+            this.NotifyPropertyChanged();
             this.Show();
-            // this.Focus();
-            this.Topmost = true;
+            this.Activate();
         }
 
         public void MainWindow_Hide()
@@ -656,8 +671,6 @@ namespace ApplicationSwitcher
                 MainWindow_Hide();
             }
         }
-
-        //public void Set Screen
 
         // TODO: Figure out that this gets called properly
         private void Window_Closed(object sender, EventArgs e)

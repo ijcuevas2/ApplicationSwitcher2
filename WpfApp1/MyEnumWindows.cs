@@ -3,6 +3,7 @@ using System.Runtime.InteropServices;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Shapes;
+using System.Text;
 
 namespace ApplicationSwitcher
 {
@@ -45,7 +46,6 @@ namespace ApplicationSwitcher
 
         public static List<string> windowTitles = new List<string>();
         public static List<ChildWindowSummary> childWindowSummaries = new List<ChildWindowSummary>();
-
 
         public static List<string> GetWindowTitles(bool includeChildren)
         {
@@ -152,19 +152,34 @@ namespace ApplicationSwitcher
             return match;
         }
 
+        [DllImport("user32.dll", CharSet = CharSet.Auto)]
+        public static extern int GetWindowTextLength(HandleRef hWnd);
+
+        [DllImport("user32.dll", CharSet = CharSet.Auto)]
+        public static extern int GetWindowText(HandleRef hWnd, StringBuilder lpString, int nMaxCount);
+
         private static string GetWindowTitle(IntPtr windowHandle)
         {
-            uint SMTO_ABORTIFHUNG = 0x0002;
-            uint WM_GETTEXT = 0xD;
-            int MAX_STRING_SIZE = 32768;
-            IntPtr result;
-            string title = string.Empty;
-            IntPtr memoryHandle = Marshal.AllocCoTaskMem(MAX_STRING_SIZE);
-            Marshal.Copy(title.ToCharArray(), 0, memoryHandle, title.Length);
-            MyEnumWindows.SendMessageTimeout(windowHandle, WM_GETTEXT, (IntPtr)MAX_STRING_SIZE, memoryHandle, SMTO_ABORTIFHUNG, (uint)1000, out result);
-            title = Marshal.PtrToStringAuto(memoryHandle);
-            Marshal.FreeCoTaskMem(memoryHandle);
-            return title;
+            object o = new object();
+            int capacity = GetWindowTextLength(new HandleRef(o, windowHandle)) * 2;
+            StringBuilder stringBuilder = new StringBuilder(capacity);
+            GetWindowText(new HandleRef(o, windowHandle), stringBuilder, stringBuilder.Capacity);
+            return stringBuilder.ToString();
         }
+
+        //private static string GetWindowTitle(IntPtr windowHandle)
+        //{
+        //    uint SMTO_ABORTIFHUNG = 0x0002;
+        //    uint WM_GETTEXT = 0xD;
+        //    int MAX_STRING_SIZE = 32768;
+        //    IntPtr result;
+        //    string title = string.Empty;
+        //    IntPtr memoryHandle = Marshal.AllocCoTaskMem(MAX_STRING_SIZE);
+        //    Marshal.Copy(title.ToCharArray(), 0, memoryHandle, title.Length);
+        //    MyEnumWindows.SendMessageTimeout(windowHandle, WM_GETTEXT, (IntPtr)MAX_STRING_SIZE, memoryHandle, SMTO_ABORTIFHUNG, (uint)1000, out result);
+        //    title = Marshal.PtrToStringAuto(memoryHandle);
+        //    Marshal.FreeCoTaskMem(memoryHandle);
+        //    return title;
+        //}
     }
 }
