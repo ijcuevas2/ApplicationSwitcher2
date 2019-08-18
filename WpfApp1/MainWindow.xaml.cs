@@ -29,8 +29,6 @@ namespace ApplicationSwitcher
         public MainWindow()
         {
             InitializeComponent();
-
-            // TODO: figure out what this does
             Style = (Style)FindResource(typeof(Window));
             Keyevent();
             this.KeyDown += new KeyEventHandler(MainWindow_KeyDown);
@@ -42,7 +40,8 @@ namespace ApplicationSwitcher
             window.WindowStartupLocation = WindowStartupLocation.CenterScreen;
             window.WindowStyle = WindowStyle.None;
             window.ResizeMode = ResizeMode.NoResize;
-            MainWindow_Hide();
+            MainWindow_Show();
+            //MainWindow_Hide();
         }
 
         private void initializeWindowSummaryList()
@@ -139,6 +138,11 @@ namespace ApplicationSwitcher
 
         public void setTextBoxVisible()
         {
+            //if (Text.Trim().Length == 0)
+            //{
+            //    setTextBoxCollapsed();
+            //}
+
             TextBoxVisibility = "Visible";
             textBoxElement.Focus();
         }
@@ -464,8 +468,15 @@ namespace ApplicationSwitcher
                         }
                     }
 
+                    // TODO: Refactor this section
                     if (isSpace(currentKey))
                     {
+
+                        if (Text.Length == 0)
+                        {
+                            goto NextHook;                           
+                        }
+
                         char currChar = ' ';
                         Text += currChar;
                     }
@@ -518,9 +529,12 @@ namespace ApplicationSwitcher
                         }
 
                         isKeyboardShortcut = true;
-                        if (isShiftKey) {
+                        if (isShiftKey)
+                        {
                             ProgramIndex--;
-                        } else {
+                        }
+                        else
+                        {
                             ProgramIndex++;
                         }
 
@@ -572,8 +586,14 @@ namespace ApplicationSwitcher
             this.setTextBoxCollapsed();
             this.resetProgramIndex();
             this.NotifyPropertyChanged();
+            this.GiveFocus();
+        }
+
+        public void GiveFocus()
+        {
             this.Show();
             this.Activate();
+            this.Focus();
         }
 
         public void MainWindow_Hide()
@@ -603,7 +623,6 @@ namespace ApplicationSwitcher
             }
         }
 
-        // TODO: Figure out that this gets called properly
         private void Window_Closed(object sender, EventArgs e)
         {
             UnhookWindowsHookEx(hHook);

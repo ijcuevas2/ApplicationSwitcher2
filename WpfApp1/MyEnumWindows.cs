@@ -89,7 +89,6 @@ namespace ApplicationSwitcher
             //windowStyles.Add("WS_MAXIMIZE", 0x01000000L);
             windowStyles.Add("WS_MINIMIZE", 0x20000000L);
 
-            // NOTE: Not necessary I guess?
             Dictionary<string, long> extendedWindowStyles = new Dictionary<string, long>();
             extendedWindowStyles.Add("WS_EX_TOPMOST", 0x00000008L);
 
@@ -125,8 +124,6 @@ namespace ApplicationSwitcher
                     //    continue;
                     //}
                 }
-
-                // System.Diagnostics.Debug.WriteLine("Match: {0}", match);
 
                 if (match)
                 {
