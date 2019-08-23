@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace ApplicationSwitcher.Properties {
+namespace WpfApp1.Properties {
     using System;
     
     
@@ -63,9 +63,29 @@ namespace ApplicationSwitcher.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
-        internal static System.Drawing.Icon Icon1 {
+        internal static System.Drawing.Icon sample {
             get {
-                object obj = ResourceManager.GetObject("Icon1", resourceCulture);
+                object obj = ResourceManager.GetObject("sample", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
+        internal static System.Drawing.Icon Switcher {
+            get {
+                object obj = ResourceManager.GetObject("Switcher", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
+        internal static System.Drawing.Icon WindowsIcon {
+            get {
+                object obj = ResourceManager.GetObject("WindowsIcon", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
             }
         }

@@ -96,8 +96,21 @@ namespace ApplicationSwitcher
             get { return _programIndex; }
             set
             {
+                Console.WriteLine("In ProgramIndex: {0}", _programIndex);
+                Console.WriteLine("value: {0}", value);
+                Console.WriteLine("filteredWindowSummaries.Count: {0}", filteredWindowSummaries.Count);
                 if (filteredWindowSummaries.Count < 1)
                 {
+                    return;
+                }
+
+                // TODO: refactor code for edge case
+                if (filteredWindowSummaries.Count == 1)
+                {
+                    this.programList.SelectedItem = this.filteredWindowSummaries[0];
+                    this.NotifyPropertyChanged();
+                    _programIndex = 0;
+                    Console.WriteLine("_programIndex: {0}", _programIndex);
                     return;
                 }
 
@@ -115,8 +128,8 @@ namespace ApplicationSwitcher
 
                 if(_programIndex != value)
                 {
-
                     _programIndex = value;
+                    Console.WriteLine("_programIndex in conditional: {0}", _programIndex);
                     this.NotifyPropertyChanged();
                 }
             }
@@ -232,15 +245,15 @@ namespace ApplicationSwitcher
         public void decrementCursorIndex()
         {
             CaretIndex -= 1;
-            System.Diagnostics.Debug.WriteLine("CaretIndex (decrement cursor): {0}", CaretIndex);
+            //System.Diagnostics.Debug.WriteLine("CaretIndex (decrement cursor): {0}", CaretIndex);
             textBoxElement.CaretIndex = CaretIndex;
         }
 
         public void incrementCursorIndex()
         {
-            System.Diagnostics.Debug.WriteLine("CaretIndex Before Increment: {0}", prevCaretIndex);
+            //System.Diagnostics.Debug.WriteLine("CaretIndex Before Increment: {0}", prevCaretIndex);
             CaretIndex++;
-            System.Diagnostics.Debug.WriteLine("CaretIndex After Increment: {0}", prevCaretIndex);
+            //System.Diagnostics.Debug.WriteLine("CaretIndex After Increment: {0}", prevCaretIndex);
             textBoxElement.CaretIndex = CaretIndex;
         }
 
@@ -395,8 +408,8 @@ namespace ApplicationSwitcher
         private int LowLevelKeyboardProc(int nCode, int wParam, ref KBDLLHOOKSSTRUCT lParam)
         {
             CaretIndex = getCurrCaretIndex();
-            System.Diagnostics.Debug.WriteLine("CaretIndex: {0}", CaretIndex);
-            System.Diagnostics.Debug.WriteLine("textBoxElement.CaretIndex:{0}", textBoxElement.CaretIndex);
+            //System.Diagnostics.Debug.WriteLine("CaretIndex: {0}", CaretIndex);
+            //System.Diagnostics.Debug.WriteLine("textBoxElement.CaretIndex:{0}", textBoxElement.CaretIndex);
 
             if (nCode >= 0)
             {
@@ -412,6 +425,15 @@ namespace ApplicationSwitcher
 
                     if (isCtrlModifier && isKeyEquals(currentKey, Key.A))
                     {
+                        goto NextHook;
+                    }
+
+                    if (isKeyEquals(currentKey, Key.RightCtrl))
+                    {
+                        Console.WriteLine("_programIndex: {0}", _programIndex);
+                        Console.WriteLine("ProgramIndex: {0}", ProgramIndex);
+                        Console.WriteLine("SelectedIndex: {0}", programList.SelectedIndex);
+                        Console.WriteLine("SelectedItem: {0}", programList.SelectedItem);
                         goto NextHook;
                     }
 
@@ -519,6 +541,21 @@ namespace ApplicationSwitcher
                         goto NextHook;
                     }
 
+                    if (isKeyEquals(currentKey, Key.Up))
+                    {
+                        ProgramIndex--;
+                    }
+
+                    if (isKeyEquals(currentKey, Key.Enter))
+                    {
+                        ProcessItemSwitch();
+                    }
+
+                    if (isKeyEquals(currentKey, Key.Down))
+                    {
+                        ProgramIndex++;
+                    }
+
                     Boolean isAltTab = lParam.vkCode == 0x09 && lParam.flags == 32;
                     if (isAltTab)
                     {
@@ -531,10 +568,12 @@ namespace ApplicationSwitcher
                         isKeyboardShortcut = true;
                         if (isShiftKey)
                         {
+                            Console.WriteLine("Keyboard Shortcut Decreasing Index");
                             ProgramIndex--;
                         }
                         else
                         {
+                            Console.WriteLine("Keyboard Shortcut Increasing Index");
                             ProgramIndex++;
                         }
 
@@ -551,14 +590,19 @@ namespace ApplicationSwitcher
                     if (isAlt)
                     {
                         System.Diagnostics.Debug.WriteLine("MainWindow_Hide");
-                        MainWindow_Hide();
-                        ProcessItemSwitch();
+                        navigateToProgram();
                     }
                 }
             }
 
             NextHook:
             return CallNextHookEx(0, nCode, wParam, ref lParam);
+        }
+
+        public void navigateToProgram()
+        {
+            MainWindow_Hide();
+            ProcessItemSwitch();
         }
 
         public void Main_TextChanged(object sender, EventArgs e)
@@ -570,12 +614,12 @@ namespace ApplicationSwitcher
         {
             if (filteredWindowSummaries.Count > 1)
             {
-                this.ProgramIndex = 1;
+                this._programIndex = 1;
             }
 
             else
             {
-                this.ProgramIndex = 0;
+                this._programIndex = 0;
             }
         }
 
@@ -608,12 +652,13 @@ namespace ApplicationSwitcher
 
         public void ProcessItemSwitch()
         {
-            int index = programList.SelectedIndex;
-            WindowSummary currSummary = filteredWindowSummaries[index];
+            // int index = programList.SelectedIndex;
+            int index = ProgramIndex;
 
             // TODO: Handle Exception
             try
             {
+                WindowSummary currSummary = filteredWindowSummaries[index];
                 currSummary.Element.SetFocus();
             }
 

@@ -21,7 +21,7 @@ namespace ApplicationSwitcher
 
             _notifyIcon = new System.Windows.Forms.NotifyIcon();
             _notifyIcon.DoubleClick += (s, args) => ShowMainWindow();
-            _notifyIcon.Icon = ApplicationSwitcher.Properties.Resources.Icon1;
+            _notifyIcon.Icon = WpfApp1.Properties.Resources.sample;
             _notifyIcon.Visible = true;
             CreateContextMenu();
         }

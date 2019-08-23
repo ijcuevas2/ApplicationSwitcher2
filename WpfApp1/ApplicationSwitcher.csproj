@@ -67,7 +67,6 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="ScreenHandler.cs" />
     <Compile Include="MyEnumWindows.cs" />
     <Compile Include="RectHelper.cs" />
     <Compile Include="TextBoxExtensions.cs" />
@@ -96,6 +95,7 @@
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -106,7 +106,13 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\Icon1.ico" />
+    <None Include="Resources\Switcher.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\WindowsIcon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\sample.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
