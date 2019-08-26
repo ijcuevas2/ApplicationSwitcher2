@@ -83,6 +83,16 @@ namespace WpfApp1.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
+        internal static System.Drawing.Icon WindowIcon {
+            get {
+                object obj = ResourceManager.GetObject("WindowIcon", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
         internal static System.Drawing.Icon WindowsIcon {
             get {
                 object obj = ResourceManager.GetObject("WindowsIcon", resourceCulture);

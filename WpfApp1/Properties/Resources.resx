@@ -127,4 +127,7 @@
   <data name="WindowsIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\WindowsIcon.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="WindowIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\WindowIcon.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
 </root>

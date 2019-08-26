@@ -2,6 +2,7 @@
 using System.Windows;
 using System.ComponentModel;
 using System.Windows.Controls;
+//using System.Windows.Forms;
 
 namespace ApplicationSwitcher
 {
@@ -21,7 +22,7 @@ namespace ApplicationSwitcher
 
             _notifyIcon = new System.Windows.Forms.NotifyIcon();
             _notifyIcon.DoubleClick += (s, args) => ShowMainWindow();
-            _notifyIcon.Icon = WpfApp1.Properties.Resources.sample;
+            _notifyIcon.Icon = WpfApp1.Properties.Resources.WindowIcon;
             _notifyIcon.Visible = true;
             CreateContextMenu();
         }
@@ -29,7 +30,7 @@ namespace ApplicationSwitcher
         private void CreateContextMenu()
         {
             _notifyIcon.ContextMenuStrip = new System.Windows.Forms.ContextMenuStrip();
-            _notifyIcon.ContextMenuStrip.Items.Add("Exit").Click += (s, e) => ExitApplication();
+            _notifyIcon.ContextMenuStrip.Items.Add("Exit").Click += (s, e) => ApplicationExit();
         }
 
         //public void App_Deactivated(object sender, EventArgs e)
@@ -47,12 +48,23 @@ namespace ApplicationSwitcher
         //     }
         // }
 
-        private void ExitApplication()
+        private void ApplicationExit()
         {
-            // _isExit = true;
+            System.Diagnostics.Debug.WriteLine("Application Exit");
             MainWindow.Close();
+            _notifyIcon.Icon.Dispose();
             _notifyIcon.Dispose();
-            _notifyIcon = null;
+        }
+        
+        public void ApplicationExitHelper(object sender, ExitEventArgs e)
+        {
+            ApplicationExit();
+        }
+
+        private void Form_FormClosing(object sender, System.Windows.Forms.FormClosedEventArgs e)
+        {
+            System.Diagnostics.Debug.WriteLine("Form Closing");
+            ApplicationExit();
         }
 
         public void HandlerForCM(object sender, ContextMenuEventArgs e)

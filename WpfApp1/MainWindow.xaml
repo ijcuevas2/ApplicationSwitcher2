@@ -8,7 +8,7 @@
         Title="MainWindow" Height="Auto" 
         Width="Auto" 
         SizeToContent="WidthAndHeight" Opacity="0.92" AllowsTransparency="True" WindowStyle="None">
-        <!--ShowInTaskbar="False">-->
+        <!--ShowInTaskbar="alse">-->
     <Window.Resources>
         <Style TargetType="{x:Type Window}">
             <Setter Property="FontFamily" Value="Segoe UI" />
@@ -28,6 +28,7 @@
                                     <Rectangle x:Name="UpperHighlight" Fill="#75FFFFFF" Visibility="Collapsed"/>
                                     <GridViewRowPresenter Columns="{TemplateBinding GridView.ColumnCollection}" Content="{TemplateBinding Content}" Grid.RowSpan="2" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" 
                                                           VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                                    <TextBlock TextAlignment="Right"/>
                                 </Grid>
                             </Border>
                         </Border>
@@ -81,7 +82,7 @@
                     <GridViewColumn Width="Auto" Header="Title">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding ProgramName}" TextAlignment="Center"/>
+                                <TextBlock Text="{Binding ProgramName}" TextAlignment="Right"/>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>

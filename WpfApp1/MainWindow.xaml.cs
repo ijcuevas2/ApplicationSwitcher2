@@ -384,11 +384,16 @@ namespace ApplicationSwitcher
 
         protected override void OnKeyDown(KeyEventArgs e)
         {
-            System.Diagnostics.Debug.WriteLine("e.SystemKey: {0}", e.SystemKey);
-            System.Diagnostics.Debug.WriteLine("KeyModifiers: {0}", Keyboard.Modifiers);
-            System.Diagnostics.Debug.WriteLine("e.Key: {0}", e.Key);
+            //System.Diagnostics.Debug.WriteLine("e.SystemKey: {0}", e.SystemKey);
+            //System.Diagnostics.Debug.WriteLine("KeyModifiers: {0}", Keyboard.Modifiers);
+            //System.Diagnostics.Debug.WriteLine("e.Key: {0}", e.Key);
 
             if (Keyboard.Modifiers == ModifierKeys.Alt && e.SystemKey == Key.Space)
+            {
+                e.Handled = true;
+            }
+
+            if (Keyboard.Modifiers == ModifierKeys.Alt && e.SystemKey == Key.F4)
             {
                 e.Handled = true;
             }
@@ -670,6 +675,7 @@ namespace ApplicationSwitcher
 
         private void Window_Closed(object sender, EventArgs e)
         {
+            Console.WriteLine("Window Closed");
             UnhookWindowsHookEx(hHook);
         }
 
