@@ -14,10 +14,13 @@
             <Setter Property="FontFamily" Value="Segoe UI" />
             <Setter Property="FontSize" Value="18" />
         </Style>
-        <Style x:Key="ListViewContainerStyle" TargetType="{x:Type ListViewItem}">
+        <Style TargetType="ContentPresenter">
+            <EventSetter Event="Loaded" Handler="ContentPresenter_Loaded"/>
+        </Style>
+        <Style x:Key="ListViewContainerStyle" TargetType="ListViewItem">
             <Setter Property="Template">
                 <Setter.Value>
-                    <ControlTemplate TargetType="{x:Type ListViewItem}">
+                    <ControlTemplate TargetType="ListViewItem">
                         <Border BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" CornerRadius="2" SnapsToDevicePixels="True">
                             <Border x:Name="InnerBorder" BorderThickness="1" CornerRadius="1">
                                 <Grid>
@@ -26,9 +29,10 @@
                                         <RowDefinition/>
                                     </Grid.RowDefinitions>
                                     <Rectangle x:Name="UpperHighlight" Fill="#75FFFFFF" Visibility="Collapsed"/>
-                                    <GridViewRowPresenter Columns="{TemplateBinding GridView.ColumnCollection}" Content="{TemplateBinding Content}" Grid.RowSpan="2" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" 
-                                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
-                                    <TextBlock TextAlignment="Right"/>
+                                    <GridViewRowPresenter Columns="{TemplateBinding GridView.ColumnCollection}" Content="{TemplateBinding Content}" 
+                                                          Grid.RowSpan="2" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" 
+                                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                                          HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"/>
                                 </Grid>
                             </Border>
                         </Border>
@@ -82,7 +86,7 @@
                     <GridViewColumn Width="Auto" Header="Title">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding ProgramName}" TextAlignment="Right"/>
+                                <TextBlock Text="{Binding ProgramName}" TextAlignment="Right" />
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>

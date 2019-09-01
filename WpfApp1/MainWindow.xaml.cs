@@ -33,6 +33,8 @@ namespace ApplicationSwitcher
             Keyevent();
             this.KeyDown += new KeyEventHandler(MainWindow_KeyDown);
 
+            // Console.WriteLine("programBlock: {0}", programBlock);
+
             initializeWindowSummaryList();
             programList.ItemsSource = filteredWindowSummaries;
             Window window = Application.Current.MainWindow;
@@ -42,6 +44,11 @@ namespace ApplicationSwitcher
             window.ResizeMode = ResizeMode.NoResize;
             MainWindow_Show();
             //MainWindow_Hide();
+        }
+
+        public void ContentPresenter_Loaded(object sender, RoutedEventArgs e)
+        {
+            (sender as ContentPresenter).HorizontalAlignment = System.Windows.HorizontalAlignment.Stretch;
         }
 
         private void initializeWindowSummaryList()
@@ -82,6 +89,9 @@ namespace ApplicationSwitcher
             {
                 this.filteredWindowSummaries.Add(this.windowSummaries[i]);
             }
+
+            // this.NotifyPropertyChanged();
+            // this.programList.SelectedItem = this.filteredWindowSummaries[0];
         }
 
 
@@ -105,14 +115,11 @@ namespace ApplicationSwitcher
                 }
 
                 // TODO: refactor code for edge case
-                if (filteredWindowSummaries.Count == 1)
-                {
-                    this.programList.SelectedItem = this.filteredWindowSummaries[0];
-                    this.NotifyPropertyChanged();
-                    _programIndex = 0;
-                    Console.WriteLine("_programIndex: {0}", _programIndex);
-                    return;
-                }
+                //if (filteredWindowSummaries.Count == 1)
+                //{
+                //    _programIndex = 0;
+                //    return;
+                //}
 
                 int upperBound = filteredWindowSummaries.Count - 1;
 
@@ -239,6 +246,12 @@ namespace ApplicationSwitcher
                 {
                     filteredWindowSummaries.Add(windowSummaries[i]);
                 }
+            }
+
+            // this.NotifyPropertyChanged();
+            if (this.filteredWindowSummaries.Count > 0)
+            {
+                this.programList.SelectedItem = this.filteredWindowSummaries[0];
             }
         }
 
@@ -495,18 +508,6 @@ namespace ApplicationSwitcher
                         }
                     }
 
-                    // TODO: Refactor this section
-                    if (isSpace(currentKey))
-                    {
-
-                        if (Text.Length == 0)
-                        {
-                            goto NextHook;                           
-                        }
-
-                        char currChar = ' ';
-                        Text += currChar;
-                    }
 
                     if (isKeyEquals(currentKey, Key.RightShift))
                     {
@@ -529,21 +530,37 @@ namespace ApplicationSwitcher
                         }
                     }
 
-                    if (isAlphaNumericKeyPress(currentKey))
+                    if (this.IsFocused)
                     {
-                        setTextBoxVisible();
-
-                        char currChar = currentKey.ToString()[0];
-
-                        if (!isShiftKey)
+                        // TODO: Refactor this section
+                        if (isSpace(currentKey))
                         {
-                            currChar = Char.ToLower(currChar);
+
+                            if (Text.Length == 0)
+                            {
+                                goto NextHook;                           
+                            }
+
+                            char currChar = ' ';
+                            Text += currChar;
                         }
 
-                        Text += currChar;
+                        if (isAlphaNumericKeyPress(currentKey))
+                        {
+                            setTextBoxVisible();
 
-                        // NOTE: this is the fix
-                        goto NextHook;
+                            char currChar = currentKey.ToString()[0];
+
+                            if (!isShiftKey)
+                            {
+                                currChar = Char.ToLower(currChar);
+                            }
+
+                            Text += currChar;
+
+                            // NOTE: this is the fix
+                            goto NextHook;
+                        }
                     }
 
                     if (isKeyEquals(currentKey, Key.Up))
@@ -551,10 +568,10 @@ namespace ApplicationSwitcher
                         ProgramIndex--;
                     }
 
-                    if (isKeyEquals(currentKey, Key.Enter))
-                    {
-                        ProcessItemSwitch();
-                    }
+                    //if (isKeyEquals(currentKey, Key.Enter))
+                    //{
+                    //    navigateToProgram();
+                    //}
 
                     if (isKeyEquals(currentKey, Key.Down))
                     {
