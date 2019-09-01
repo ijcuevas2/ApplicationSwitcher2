@@ -42,6 +42,7 @@ namespace ApplicationSwitcher
             window.WindowStartupLocation = WindowStartupLocation.CenterScreen;
             window.WindowStyle = WindowStyle.None;
             window.ResizeMode = ResizeMode.NoResize;
+            SetTargetDisplay();
             MainWindow_Show();
             //MainWindow_Hide();
         }
@@ -65,6 +66,11 @@ namespace ApplicationSwitcher
                 this.filteredWindowSummaries.Add(this.windowSummaries[i]);
             }
         }
+
+        //public static string Truncate(this string value)
+        //{
+        //    return value.Length <= 20 ? value : value.Substring(0, 20) + "...";
+        //}
 
         private void clearWindowSummaries()
         {
@@ -530,8 +536,6 @@ namespace ApplicationSwitcher
                         }
                     }
 
-                    if (this.IsFocused)
-                    {
                         // TODO: Refactor this section
                         if (isSpace(currentKey))
                         {
@@ -561,17 +565,16 @@ namespace ApplicationSwitcher
                             // NOTE: this is the fix
                             goto NextHook;
                         }
-                    }
 
                     if (isKeyEquals(currentKey, Key.Up))
                     {
                         ProgramIndex--;
                     }
 
-                    //if (isKeyEquals(currentKey, Key.Enter))
-                    //{
-                    //    navigateToProgram();
-                    //}
+                    if (isKeyEquals(currentKey, Key.Enter))
+                    {
+                        navigateToProgram();
+                    }
 
                     if (isKeyEquals(currentKey, Key.Down))
                     {

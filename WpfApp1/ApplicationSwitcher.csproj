@@ -117,5 +117,8 @@
   <ItemGroup>
     <None Include="Resources\WindowIcon.ico" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\NavigationApp_16x.ico" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

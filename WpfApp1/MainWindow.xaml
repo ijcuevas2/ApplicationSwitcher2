@@ -7,7 +7,7 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="Auto" 
         Width="Auto" 
-        SizeToContent="WidthAndHeight" Opacity="0.92" AllowsTransparency="True" WindowStyle="None">
+        SizeToContent="WidthAndHeight" Opacity="0.92" AllowsTransparency="True" WindowStyle="None" ResizeMode="NoResize" Topmost="True">
         <!--ShowInTaskbar="alse">-->
     <Window.Resources>
         <Style TargetType="{x:Type Window}">
@@ -30,9 +30,7 @@
                                     </Grid.RowDefinitions>
                                     <Rectangle x:Name="UpperHighlight" Fill="#75FFFFFF" Visibility="Collapsed"/>
                                     <GridViewRowPresenter Columns="{TemplateBinding GridView.ColumnCollection}" Content="{TemplateBinding Content}" 
-                                                          Grid.RowSpan="2" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" 
-                                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                                                          HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"/>
+                                                          Grid.RowSpan="2" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
                                 </Grid>
                             </Border>
                         </Border>
