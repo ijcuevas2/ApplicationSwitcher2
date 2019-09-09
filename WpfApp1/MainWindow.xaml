@@ -63,7 +63,10 @@
     </Window.ContextMenu>
     <StackPanel>
         <!--<TextBox  Text="{Binding Text, Mode=OneWay}" IsReadOnly="True" IsReadOnlyCaretVisible="True"-->
-        <TextBox  MaxLength="30" Name="textBoxElement" Background="#1D1D1D" TextElement.Foreground="White" 
+        <TextBox  IsReadOnly="True"
+                  IsReadOnlyCaretVisible="True"
+                  MaxLength="30" Name="textBoxElement" Background="#1D1D1D" 
+                  TextElement.Foreground="White" 
                   Height="30"  
                   Visibility="{Binding TextBoxVisibility}" 
                   TextChanged="textBoxElement_TextChanged"

@@ -33,8 +33,6 @@ namespace ApplicationSwitcher
             Keyevent();
             this.KeyDown += new KeyEventHandler(MainWindow_KeyDown);
 
-            // Console.WriteLine("programBlock: {0}", programBlock);
-
             initializeWindowSummaryList();
             programList.ItemsSource = filteredWindowSummaries;
             Window window = Application.Current.MainWindow;
@@ -96,8 +94,6 @@ namespace ApplicationSwitcher
                 this.filteredWindowSummaries.Add(this.windowSummaries[i]);
             }
 
-            // this.NotifyPropertyChanged();
-            // this.programList.SelectedItem = this.filteredWindowSummaries[0];
         }
 
 
@@ -112,9 +108,9 @@ namespace ApplicationSwitcher
             get { return _programIndex; }
             set
             {
-                Console.WriteLine("In ProgramIndex: {0}", _programIndex);
-                Console.WriteLine("value: {0}", value);
-                Console.WriteLine("filteredWindowSummaries.Count: {0}", filteredWindowSummaries.Count);
+                //Console.WriteLine("In ProgramIndex: {0}", _programIndex);
+                //Console.WriteLine("value: {0}", value);
+                //Console.WriteLine("filteredWindowSummaries.Count: {0}", filteredWindowSummaries.Count);
                 if (filteredWindowSummaries.Count < 1)
                 {
                     return;
@@ -164,11 +160,6 @@ namespace ApplicationSwitcher
 
         public void setTextBoxVisible()
         {
-            //if (Text.Trim().Length == 0)
-            //{
-            //    setTextBoxCollapsed();
-            //}
-
             TextBoxVisibility = "Visible";
             textBoxElement.Focus();
         }
@@ -178,76 +169,44 @@ namespace ApplicationSwitcher
             TextBoxVisibility = "Collapsed";
         }
 
-        //private String _text = "";
-        //public String Text
-        //{
-        //    get { return _text;  }
-        //    set
-        //    {
-        //        if (_text != value)
-        //        {
-        //            Boolean addingText = value.Length > _text.Length;
-        //            _text = value;
-
-        //            this.NotifyPropertyChanged();
-        //            this.updateWindowSummaries();
-        //            if (addingText)
-        //            {
-        //                this.incrementCursorIndex();
-        //            }
-
-        //            else
-        //            {
-        //                this.decrementCursorIndex();
-        //            }
-        //        }
-        //    }
-        //}
 
         // NOTE: NotifyPropertyChanged is not called here
-        private int _caretIndex;
         public int CaretIndex
         {
-            get { return _caretIndex; }
+            get { return textBoxElement.CaretIndex; }
             set
             {
                 if (value < 0)
                 {
-                    _caretIndex = 0;
-                    return;
+                    value = 0;
                 }
 
-                int targetIndex = textBoxElementText.Length + 1;
-
-                if (_caretIndex > targetIndex)
+                if (value > Text.Length)
                 {
-                    _caretIndex = targetIndex;
+                    value = Text.Length;
                 }
 
-                else
-                {
-                    _caretIndex = value;
+
+                if (value != textBoxElement.CaretIndex) {
+                    textBoxElement.CaretIndex = value;
                 }
             }
         }
 
-        public int getCurrCaretIndex()
-        {
-            return textBoxElement.CaretIndex;
-        }
-
-        public string textBoxElementText
+        public string Text
         {
             get {
+                System.Diagnostics.Debug.Print("Text Getter");
                 return textBoxElement.Text;
             }
 
             set {
+                System.Diagnostics.Debug.Print("Text Setter");
                 textBoxElement.Text = value;
             }
         }
 
-        public string selectedText
+        public string SelectedText
         {
             get {
                 return textBoxElement.SelectedText;
@@ -266,7 +225,7 @@ namespace ApplicationSwitcher
             {
                 String programName = windowSummaries[i].ProgramName.ToLower();
                 String programWindowTitle = windowSummaries[i].ProgramWindowTitle.ToLower();
-                String filterText = textBoxElementText.ToLower();
+                String filterText = Text.ToLower();
 
                 // TODO: Change name of variable
                 Boolean isRelevantProgram = programName.Contains(filterText) ||
@@ -284,19 +243,27 @@ namespace ApplicationSwitcher
             }
         }
 
-        public void decrementCursorIndex()
-        {
-            CaretIndex -= 1;
-            //System.Diagnostics.Debug.WriteLine("CaretIndex (decrement cursor): {0}", CaretIndex);
-            textBoxElement.CaretIndex = CaretIndex;
+
+        public void decrementCursorIndex() {
+            if (SelectedText.Length > 0)
+            {
+                textBoxElement.SelectionLength = 0;
+                return;
+            }
+
+            CaretIndex--;
         }
 
         public void incrementCursorIndex()
         {
-            //System.Diagnostics.Debug.WriteLine("CaretIndex Before Increment: {0}", prevCaretIndex);
+            if (SelectedText.Length > 0)
+            {
+                int targetIndex = CaretIndex + textBoxElement.SelectionLength;
+                CaretIndex = targetIndex;
+                return;
+            }
+
             CaretIndex++;
-            //System.Diagnostics.Debug.WriteLine("CaretIndex After Increment: {0}", prevCaretIndex);
-            textBoxElement.CaretIndex = CaretIndex;
         }
 
         public void MainWindow_KeyDown(object sender, KeyEventArgs e)
@@ -329,36 +296,6 @@ namespace ApplicationSwitcher
             return ((currChar >= 'A' && currChar <= 'Z'))
                 || ((currChar >= 'a' && currChar <= 'z'))
                 || ((currChar >= '0' && currChar <= '9'));
-        }
-
-        public Boolean isSpace(Key key)
-        {
-            if (key == Key.Space)
-            {
-                return true;
-            }
-
-            return false;
-        }
-
-        public Boolean isBackSpace(Key key)
-        {
-            if (key == Key.Back)
-            {
-                return true;
-            }
-
-            return false;
-        }
-
-        public Boolean isDelete(Key key)
-        {
-            if (key == Key.Delete)
-            {
-                return true;
-            }
-
-            return false;
         }
 
         public Boolean isKeyEquals(Key first, Key second)
@@ -440,131 +377,221 @@ namespace ApplicationSwitcher
                 e.Handled = true;
             }
 
+            //else
+            //{
+            //    base.OnKeyDown(e);
+            //}
+        }
+
+        private int? selectionPivot = null;
+        public void SetTextSelection(bool rightDir)
+        {
+            if (SelectedText.Length == 0 && selectionPivot == null)
+            {
+                selectionPivot = CaretIndex;
+                if (rightDir)
+                {
+                    //textBoxElement.SelectionStart = CaretIndex;
+                    //textBoxElement.SelectionLength += 1;
+                    textBoxElement.Select(CaretIndex, 1);
+                }
+
+                else
+                {
+                    //textBoxElement.SelectionStart = CaretIndex - 1;
+                    //textBoxElement.SelectionLength += 1;
+                    if (CaretIndex > 0)
+                    {
+                        textBoxElement.Select(CaretIndex - 1, 1);
+                    }
+                }
+
+                return;
+            }
+
+            if (rightDir)
+            {
+                if (CaretIndex < selectionPivot)
+                {
+                    textBoxElement.Select(CaretIndex + 1, SelectedText.Length - 1);
+                }
+
+                else
+                {
+                    int targetLength = SelectedText.Length + 1;
+                    if (CaretIndex + targetLength <= Text.Length)
+                    {
+                        textBoxElement.Select(CaretIndex, targetLength);
+                    }
+                }
+            }
+
             else
             {
-                base.OnKeyDown(e);
+                if (CaretIndex == selectionPivot && textBoxElement.SelectionLength == 1)
+                {
+                    textBoxElement.SelectionLength = 0;
+                }
+
+                int currentSelectionSpan = CaretIndex + textBoxElement.SelectionLength;
+
+                if (currentSelectionSpan <= selectionPivot)
+                {
+                    if (CaretIndex > 0)
+                    {
+                        textBoxElement.Select(CaretIndex - 1, SelectedText.Length + 1);
+                    }
+                }
+
+                else if (currentSelectionSpan > selectionPivot)
+                {
+                    textBoxElement.Select(CaretIndex, SelectedText.Length - 1);
+                }
             }
         }
 
-        public void setCaretIndex(int index)
+        public void textBoxElementSelection(int startIndex, int selectionLength)
         {
-            CaretIndex = index;
-            textBoxElement.CaretIndex = CaretIndex;
+            textBoxElement.SelectionLength = 0;
+            textBoxElement.Select(startIndex, selectionLength);
         }
 
         private int LowLevelKeyboardProc(int nCode, int wParam, ref KBDLLHOOKSSTRUCT lParam)
         {
-            CaretIndex = getCurrCaretIndex();
-            //System.Diagnostics.Debug.WriteLine("CaretIndex: {0}", CaretIndex);
-            //System.Diagnostics.Debug.WriteLine("textBoxElement.CaretIndex:{0}", textBoxElement.CaretIndex);
-
+            //System.Diagnostics.Debug.Print("LowLevelKeyboardProc");
             if (nCode >= 0)
             {
-                Boolean isKeyDown = wParam == 256 || wParam == 260;
-                Boolean isKeyUp = wParam == 257 || wParam == 261;
+                bool isKeyDown = wParam == 256 || wParam == 260;
+                bool isKeyUp = wParam == 257 || wParam == 261;
                 if (isKeyDown)
                 {
                     Key currentKey = KeyInterop.KeyFromVirtualKey(lParam.vkCode);
-                    Boolean isShiftKey = (Keyboard.Modifiers & ModifierKeys.Shift) != 0;
-                    Boolean isAlt = lParam.flags == 32;
-                    Boolean isCtrlModifier = (Keyboard.Modifiers & ModifierKeys.Control) != 0;
-                    Boolean isAltModifier = (Keyboard.Modifiers & ModifierKeys.Alt) != 0;
+                    bool isShiftKey = (Keyboard.Modifiers & ModifierKeys.Shift) != 0;
+                    bool isCtrlModifier = (Keyboard.Modifiers & ModifierKeys.Control) != 0;
+                    bool isShiftModifier = (Keyboard.Modifiers & ModifierKeys.Shift) != 0;
+                    bool isAltModifier = (Keyboard.Modifiers & ModifierKeys.Alt) != 0;
 
                     if (isCtrlModifier && isKeyEquals(currentKey, Key.A))
                     {
+                        textBoxElement.SelectAll();
                         goto NextHook;
                     }
 
                     if (isKeyEquals(currentKey, Key.RightCtrl))
                     {
-                        Console.WriteLine("_programIndex: {0}", _programIndex);
-                        Console.WriteLine("ProgramIndex: {0}", ProgramIndex);
-                        Console.WriteLine("SelectedIndex: {0}", programList.SelectedIndex);
-                        Console.WriteLine("SelectedItem: {0}", programList.SelectedItem);
+                        System.Diagnostics.Debug.Print("_programIndex: {0}", _programIndex);
+                        System.Diagnostics.Debug.Print("ProgramIndex: {0}", ProgramIndex);
+                        System.Diagnostics.Debug.Print("SelectedIndex: {0}", programList.SelectedIndex);
+                        System.Diagnostics.Debug.Print("SelectedItem: {0}", programList.SelectedItem);
+                        System.Diagnostics.Debug.Print("CaretIndex: {0}", textBoxElement.CaretIndex);
                         goto NextHook;
                     }
 
-                    //if (isKeyEquals(currentKey, Key.Back))
-                    //{
-                    //    if (Text.Length > 0)
-                    //    {
-                    //        int selectionStart = textBoxElement.SelectionStart;
-                    //        int selectionLength = textBoxElement.SelectionLength;
-                    //        int SelectionEnd = textBoxElement.SelectionStart + textBoxElement.SelectionLength;
-                    //        System.Diagnostics.Debug.WriteLine("CaretIndex (In Backspace): {0}", CaretIndex);
+                    if (isKeyEquals(currentKey, Key.Back))
+                    {
+                        if (SelectedText.Length > 0)
+                        {
+                            SelectedText = "";
+                            goto NextHook;
+                        }
 
-                    //        if (selectionLength > 0)
-                    //        {
-                    //            setCaretIndex(selectionStart + 1);
-                    //            Text = Text.Substring(0, selectionStart) + Text.Substring(SelectionEnd);
-                    //        }
+                        if (CaretIndex < 2)
+                        {
+                            Text = Text.Substring(CaretIndex);
+                        }
 
-                    //        else if (selectionStart != 0)
-                    //        {
-                    //            Text = Text.Substring(0, selectionStart - 1) + Text.Substring(SelectionEnd);
-                    //        }
+                        else
+                        {
+                            int prevCaretIndex = CaretIndex;
+                            int upperTarget = Math.Min(Text.Length, CaretIndex);
+                            Text = Text.Substring(0, CaretIndex - 1) + Text.Substring(upperTarget);
+                            CaretIndex = prevCaretIndex - 1;
+                        }
 
-                    //        else if (SelectionEnd == Text.Length)
-                    //        {
-                    //            Text = "";
-                    //            setCaretIndex(0);
-                    //        }
+                        goto NextHook;
+                    }
 
-                    //        else 
-                    //        {
-                    //            Text = Text.Substring(SelectionEnd);
-                    //        }
-                    //    }
+                    if (isKeyEquals(currentKey, Key.Delete))
+                    {
+                        if (SelectedText.Length > 0)
+                        {
+                            SelectedText = "";
+                        }
 
-                    //    goto NextHook;
-                    //}
+                        else
+                        {
+                            int prevCaretIndex = CaretIndex;
+                            int upperTarget = Math.Min(Text.Length, CaretIndex + 1);
+                            Text = Text.Substring(0, CaretIndex) + Text.Substring(upperTarget);
+                            CaretIndex = prevCaretIndex;
+                        }
+                    }
 
                     if (isKeyEquals(currentKey, Key.Home))
                     {
                         CaretIndex = 0;
                     }
 
-                    if (isKeyEquals(currentKey, Key.Delete))
+                    if (isKeyEquals(currentKey, Key.End))
                     {
-                        Boolean lastIndex = textBoxElementText.Length == CaretIndex;
-                        if (textBoxElementText.Length > 0 && !lastIndex)
-                        {
-                            int SelectionStart = textBoxElement.SelectionStart;
-                            int SelectionEnd = textBoxElement.SelectionStart + textBoxElement.SelectionLength;
-
-                            textBoxElementText = textBoxElementText.Substring(0, SelectionStart) + textBoxElementText.Substring(SelectionEnd + 1);
-                            incrementCursorIndex();
-                        }
+                        CaretIndex = Text.Length;
                     }
 
-
-                    if (isKeyEquals(currentKey, Key.RightShift))
+                    if (isKeyEquals(currentKey, Key.PageUp))
                     {
-                        // MainWindow_Hide();
-                        System.Diagnostics.Debug.WriteLine("textBoxElement.SelectionStart: {0}", textBoxElement.SelectionStart);
-                        System.Diagnostics.Debug.WriteLine("textBoxElement.SelectionLength: {0}", textBoxElement.SelectionLength);
-                        textBoxElement.Text += "a";
+                        textBoxElement.CaretIndex = 5;
                     }
 
                     // TODO: check for unnecessary decrementing or incrementing
-                    if (isAltModifier)
+                    if (isKeyEquals(currentKey, Key.Left))
                     {
-                        if (isKeyEquals(currentKey, Key.Left))
+                        if (isShiftModifier)
                         {
-                            decrementCursorIndex();
+                            if (isCtrlModifier)
+                            {
+                                textBoxElementSelection(0, CaretIndex);
+                            }
+
+                            else
+                            {
+                                SetTextSelection(false);
+                            }
+
+                            goto NextHook;
                         }
 
-                        if (isKeyEquals(currentKey, Key.Right))
+                        decrementCursorIndex();
+                        goto NextHook;
+                    }
+
+                    if (isKeyEquals(currentKey, Key.Right))
+                    {
+
+                        System.Diagnostics.Debug.Print("SelectedText Update");
+                        if (isShiftModifier)
                         {
-                            incrementCursorIndex();
+                            System.Diagnostics.Debug.Print("CtrlModifier SelectedText Update");
+                            if (isCtrlModifier)
+                            {
+                                CaretIndex += SelectedText.Length;
+                                textBoxElementSelection(CaretIndex, Text.Length - CaretIndex);
+                            }
+
+                            else
+                            {
+                                SetTextSelection(true);
+                            }
+
+                            goto NextHook;
                         }
+
+                        incrementCursorIndex();
                     }
 
                     // TODO: Refactor this section
-                    if (isSpace(currentKey))
+                    if (isKeyEquals(currentKey, Key.Space))
                     {
-
-                        if (textBoxElementText.Length == 0)
+                        if (Text.Length == 0)
                         {
                             goto NextHook;
                         }
@@ -585,7 +612,11 @@ namespace ApplicationSwitcher
                         }
 
                         string currString = currChar.ToString();
-                        textBoxElement.Text = textBoxElement.Text.Insert(textBoxElement.CaretIndex, currString);
+                        int currIndex = CaretIndex;
+                        string targetText = Text.Insert(CaretIndex, currString);
+                        System.Diagnostics.Debug.Print("targetText: {0}", targetText);
+                        Text = targetText;
+                        CaretIndex = currIndex + 1;
 
                         // NOTE: this is the fix
                         goto NextHook;
@@ -596,17 +627,18 @@ namespace ApplicationSwitcher
                         ProgramIndex--;
                     }
 
-                    if (isKeyEquals(currentKey, Key.Enter))
-                    {
-                        navigateToProgram();
-                    }
-
                     if (isKeyEquals(currentKey, Key.Down))
                     {
                         ProgramIndex++;
                     }
 
-                    Boolean isAltTab = lParam.vkCode == 0x09 && lParam.flags == 32;
+                    if (isKeyEquals(currentKey, Key.Enter))
+                    {
+                        navigateToProgram();
+                    }
+
+
+                    bool isAltTab = lParam.vkCode == 0x09 && lParam.flags == 32;
                     if (isAltTab)
                     {
                         if (!this.IsVisible)
@@ -634,13 +666,19 @@ namespace ApplicationSwitcher
 
                 if (isKeyUp)
                 {
-                    Boolean isAlt = lParam.vkCode == 0xA4 || lParam.vkCode == 0xA5;
+                    bool isAlt = lParam.vkCode == 0xA4 || lParam.vkCode == 0xA5;
 
                     // NOTE: Be Careful
                     if (isAlt)
                     {
                         System.Diagnostics.Debug.WriteLine("MainWindow_Hide");
                         navigateToProgram();
+                    }
+
+                    if ((Keyboard.IsKeyUp(Key.LeftShift) || Keyboard.IsKeyUp(Key.RightShift))
+                        && !Keyboard.IsKeyDown(Key.LeftShift) && !Keyboard.IsKeyDown(Key.RightShift))
+                    {
+                        selectionPivot = null;
                     }
                 }
             }
@@ -676,7 +714,7 @@ namespace ApplicationSwitcher
         public void MainWindow_Show()
         {
             reloadWindowSummaryList();
-            this.textBoxElementText = "";
+            this.Text = "";
             this.setTextBoxCollapsed();
             this.resetProgramIndex();
             this.NotifyPropertyChanged();
@@ -720,7 +758,7 @@ namespace ApplicationSwitcher
 
         private void Window_Closed(object sender, EventArgs e)
         {
-            Console.WriteLine("Window Closed");
+            System.Diagnostics.Debug.Print("Window Closed");
             UnhookWindowsHookEx(hHook);
         }
 
